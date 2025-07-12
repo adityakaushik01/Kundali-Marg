@@ -9,8 +9,8 @@ app.use(cors());
 app.use(express.json());
 
 // Replace with your credentials
-const clientId = import.meta.env.clientId;
-const clientSecret = import.meta.env.clientSecret;
+const clientId = import.meta.env.VITE_CLIENT_ID;
+const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
 
 // Token proxy endpoint
 app.post('/api/token', async (req, res) => {
