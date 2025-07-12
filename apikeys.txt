@@ -1,0 +1,4 @@
+Client ID	
+1aea81da-af9f-42ce-a1bf-cd5d1c424f3a
+Client Secret	
+qkWLBuKYnh7rSU1oXQTPJXYCFhTV6GoIgZNiUUD9
