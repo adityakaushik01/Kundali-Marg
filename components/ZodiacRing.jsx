@@ -1,15 +1,15 @@
-import aries from "../assets/aries.png";
-import taurus from "../assets/taurus.png";
-import gemini from "../assets/gemini.png";
-import cancer from "../assets/cancer.png";
-import leo from "../assets/leo.png";
-import virgo from "../assets/virgo.png";
-import libra from "../assets/libra.png";
-import scorpio from "../assets/scorpio.png";
-import sagittarius from "../assets/sagittarius.png";
-import capricorn from "../assets/capricorn.png";
-import aquarius from "../assets/aquarius.png";
-import pisces from "../assets/pisces.png";
+import aries from "../src/assets/aries.png";
+import taurus from "../src/assets/taurus.png";
+import gemini from "../src/assets/gemini.png";
+import cancer from "../src/assets/cancer.png";
+import leo from "../src/assets/leo.png";
+import virgo from "../src/assets/virgo.png";
+import libra from "../src/assets/libra.png";
+import scorpio from "../src/assets/scorpio.png";
+import sagittarius from "../src/assets/sagittarius.png";
+import capricorn from "../src/assets/capricorn.png";
+import aquarius from "../src/assets/aquarius.png";
+import pisces from "../src/assets/pisces.png";
 
 const ZODIAC_IMAGES = [
   { name: "Aries", src: aries },
