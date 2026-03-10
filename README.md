@@ -8,7 +8,9 @@ The project combines **modern frontend technologies with traditional Jyotish cal
 
 # 🌐 Live Demo
 
-🔗 https://adityakaushik01.github.io/Kundali-Marg/
+<a href="https://adityakaushik01.github.io/Kundali-Marg/" target="_blank">
+  <img src="https://img.shields.io/badge/🔗 Click Here-blue?style=for-the-badge" alt="Live Demo" />
+</a>
 
 ---
 
