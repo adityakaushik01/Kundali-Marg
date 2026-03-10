@@ -1,28 +1,29 @@
-/**
- * ZodiacRing
- *
- * Place 12 images in /src/assets/zodiac/ named:
- * aries.png, taurus.png, gemini.png, cancer.png, leo.png, virgo.png,
- * libra.png, scorpio.png, sagittarius.png, capricorn.png, aquarius.png, pisces.png
- *
- * Usage:
- *   import ZodiacRing from "../components/ZodiacRing";
- *   <ZodiacRing />
- */
+import aries from "../assets/aries.png";
+import taurus from "../assets/taurus.png";
+import gemini from "../assets/gemini.png";
+import cancer from "../assets/cancer.png";
+import leo from "../assets/leo.png";
+import virgo from "../assets/virgo.png";
+import libra from "../assets/libra.png";
+import scorpio from "../assets/scorpio.png";
+import sagittarius from "../assets/sagittarius.png";
+import capricorn from "../assets/capricorn.png";
+import aquarius from "../assets/aquarius.png";
+import pisces from "../assets/pisces.png";
 
 const ZODIAC_IMAGES = [
-  { name: "Aries",       src: "src/assets/aries.png"       },
-  { name: "Taurus",      src: "src/assets/taurus.png"      },
-  { name: "Gemini",      src: "src/assets/gemini.png"      },
-  { name: "Cancer",      src: "src/assets/cancer.png"      },
-  { name: "Leo",         src: "src/assets/leo.png"         },
-  { name: "Virgo",       src: "src/assets/virgo.png"       },
-  { name: "Libra",       src: "src/assets/libra.png"       },
-  { name: "Scorpio",     src: "src/assets/scorpio.png"     },
-  { name: "Sagittarius", src: "src/assets/sagittarius.png" },
-  { name: "Capricorn",   src: "src/assets/capricorn.png"   },
-  { name: "Aquarius",    src: "src/assets/aquarius.png"    },
-  { name: "Pisces",      src: "src/assets/pisces.png"      },
+  { name: "Aries", src: aries },
+  { name: "Taurus", src: taurus },
+  { name: "Gemini", src: gemini },
+  { name: "Cancer", src: cancer },
+  { name: "Leo", src: leo },
+  { name: "Virgo", src: virgo },
+  { name: "Libra", src: libra },
+  { name: "Scorpio", src: scorpio },
+  { name: "Sagittarius", src: sagittarius },
+  { name: "Capricorn", src: capricorn },
+  { name: "Aquarius", src: aquarius },
+  { name: "Pisces", src: pisces },
 ];
 
 const RING_RADIUS = 450;
