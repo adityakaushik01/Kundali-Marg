@@ -3,6 +3,8 @@ import { useState } from 'react';
 import Stars from "../components/Stars";
 import DecorativeElement from "../components/DecorativeElement";
 import BottomDecorativeElement from "../components/BottomDecorativeElement";
+import ZodiacRing from "../components/ZodiacRing";
+import AmbientGlow from "../components/AmbientGlow";
 
 const ShowKundali = () => {
   const location = useLocation();
@@ -10,16 +12,20 @@ const ShowKundali = () => {
   const { kundaliData, name, birthDetails } = location.state || {};
   const [activeTab, setActiveTab] = useState('chart');
 
-  // Redirect if no data
+  // ── No data guard ──────────────────────────────────────────────────────────
   if (!kundaliData || !kundaliData.data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-900 text-white flex items-center justify-center">
-        <div className="text-center p-10 rounded-2xl backdrop-blur-md border border-white/20 bg-white/5">
-          <h2 className="text-2xl font-bold text-amber-300 mb-4">No Kundali Data Found</h2>
-          <p className="text-lg text-gray-300 mb-6">Please generate your Kundali first.</p>
+      <div
+        className="min-h-screen text-white flex items-center justify-center"
+        style={{ background: 'linear-gradient(135deg,#050810 0%,#0a0f1e 30%,#0d1225 60%,#080d1a 100%)' }}
+      >
+        <div className="text-center p-10 rounded-2xl backdrop-blur-md border border-amber-400/20 bg-white/5">
+          <div className="text-5xl mb-4">🔮</div>
+          <h2 className="text-2xl font-bold text-amber-300 mb-3">No Kundali Data Found</h2>
+          <p className="text-gray-400 mb-6">Please generate your Kundali first.</p>
           <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl font-semibold transition-all duration-300"
+            onClick={() => navigate('/GenerateKundali')}
+            className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-black font-bold rounded-xl transition-all duration-300"
           >
             Generate Kundali
           </button>
@@ -28,167 +34,259 @@ const ShowKundali = () => {
     );
   }
 
-  // Helper function to get planets in a house
+  // ── Helpers ────────────────────────────────────────────────────────────────
   const getPlanetsInHouse = (houseNumber) => {
     if (!kundaliData?.data?.chart?.rasi) return [];
     const houseData = kundaliData.data.chart.rasi.find(item => item.house === houseNumber);
     if (!houseData || !houseData.planet) return [];
-    
-    return houseData.planet.split(',').map(planet => planet.trim()).filter(planet => planet);
+    return houseData.planet.split(',').map(p => p.trim()).filter(Boolean);
   };
 
-  // Helper function to get sign for a house
   const getSignInHouse = (houseNumber) => {
     if (!kundaliData?.data?.chart?.rasi) return '';
     const houseData = kundaliData.data.chart.rasi.find(item => item.house === houseNumber);
     return houseData ? houseData.sign : '';
   };
 
-  // Traditional Vedic Chart Component
+  // Planet abbreviations so they fit inside chart cells
+  const ABBR = {
+    Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me',
+    Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra',
+    Ketu: 'Ke', Uranus: 'Ur', Neptune: 'Ne', Pluto: 'Pl',
+    Ascendant: 'As', Lagna: 'La',
+  };
+  const abbr = (p) => ABBR[p] || p.slice(0, 2);
+
+  // ── North Indian Vedic Chart ───────────────────────────────────────────────
+  // The North Indian chart is a fixed diamond grid.
+  // Houses are FIXED positions — the sign rotates, not the house shape.
+  //
+  //         ┌───────┬───────┬───────┐
+  //         │  12   │   1   │   2   │
+  //         ├───────┼───────┼───────┤
+  //         │  11   │ (ctr) │   3   │
+  //         ├───────┼───────┼───────┤
+  //         │  10   │   9   │   4   │  ← wait, North Indian is diamond not grid
+  //         └───────┴───────┴───────┘
+  //
+  // True North Indian diamond layout (600×600 SVG):
+  //
+  //   House 1  → top    triangle  (between top vertex and center)
+  //   House 2  → top-right small triangle
+  //   House 3  → right  triangle
+  //   House 4  → bottom triangle
+  //   House 5  → bottom-right small triangle ... etc.
+  //
+  //  Correct fixed diamond positions for text labels:
+  //
+  //        12 | 1 | 2
+  //       ————+———+————
+  //        11 |   | 3
+  //       ————+———+————
+  //        10 | 9 | 8   ← bottom half
+  //              |
+  //              5 (bottom tip)  etc.
+  //
+  // Standard North Indian house label centers (in a 540×540 chart):
+
+  const S = 540; // SVG size
+  const C = S / 2; // center = 270
+  const T = 30;  // top margin to diamond tip
+
+  // Diamond vertices
+  const top    = { x: C,     y: T };
+  const right  = { x: S - T, y: C };
+  const bottom = { x: C,     y: S - T };
+  const left   = { x: T,     y: C };
+
+  // Inner diamond (center box) corners
+  const innerOff = (S - T * 2) / 4;  // ~120
+  const itl = { x: C - innerOff, y: C - innerOff }; // inner top-left
+  const itr = { x: C + innerOff, y: C - innerOff }; // inner top-right
+  const ibr = { x: C + innerOff, y: C + innerOff }; // inner bottom-right
+  const ibl = { x: C - innerOff, y: C + innerOff }; // inner bottom-left
+
+  // House cell label centers
+  // North Indian fixed layout:
+  // House 1 = top diamond cell
+  // House 2 = top-right small triangle
+  // House 3 = right cell
+  // House 4 = bottom-right small triangle
+  // House 5 = bottom cell
+  // House 6 = bottom-left small triangle
+  // House 7 = left cell
+  // House 8 = top-left small triangle
+  // House 9 = inner top-left
+  // House 10 = inner top-right
+  // House 11 = inner bottom-right
+  // House 12 = inner bottom-left
+
+  const houseCenters = {
+    1:  { x: C,                    y: (top.y + itl.y) / 2 + 5 },           // top
+    2:  { x: (right.x + itr.x) / 2 + 5, y: (top.y + itr.y) / 2 + 5 },    // top-right
+    3:  { x: (right.x + itr.x) / 2 + 5, y: C },                           // right
+    4:  { x: (right.x + ibr.x) / 2 + 5, y: (bottom.y + ibr.y) / 2 - 5 }, // bottom-right
+    5:  { x: C,                    y: (bottom.y + ibl.y) / 2 - 5 },        // bottom
+    6:  { x: (left.x + ibl.x) / 2 - 5,  y: (bottom.y + ibl.y) / 2 - 5 }, // bottom-left
+    7:  { x: (left.x + itl.x) / 2 - 5,  y: C },                           // left
+    8:  { x: (left.x + itl.x) / 2 - 5,  y: (top.y + itl.y) / 2 + 5 },    // top-left
+    9:  { x: (itl.x + C) / 2,     y: (itl.y + C) / 2 },                   // inner top-left
+    10: { x: (itr.x + C) / 2,     y: (itr.y + C) / 2 },                   // inner top-right
+    11: { x: (ibr.x + C) / 2,     y: (ibr.y + C) / 2 },                   // inner bottom-right
+    12: { x: (ibl.x + C) / 2,     y: (ibl.y + C) / 2 },                   // inner bottom-left
+  };
+
   const VedicChart = () => {
-    const houses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    
+    const stroke = '#f59e0b';
+    const sw = 1.5;
+
     return (
       <div className="flex justify-center">
-        <div className="relative" style={{ width: '600px', height: '600px' }}>
-          <svg width="600" height="600" viewBox="0 0 600 600" className="border-2 border-amber-400 rounded-lg bg-black/20">
-            {/* Chart Background */}
-            <rect width="600" height="600" fill="rgba(0,0,0,0.2)" />
-            
-            {/* Diamond Shape Chart - North Indian Style */}
+        <div style={{ width: '100%', maxWidth: '560px' }}>
+          <svg
+            viewBox={`0 0 ${S} ${S}`}
+            style={{
+              width: '100%',
+              height: 'auto',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1.5px solid rgba(245,158,11,0.4)',
+            }}
+          >
+            {/* ── Outer diamond ── */}
             <polygon
-              points="300,80 520,300 300,520 80,300"
-              fill="none"
-              stroke="#f59e0b"
-              strokeWidth="3"
+              points={`${top.x},${top.y} ${right.x},${right.y} ${bottom.x},${bottom.y} ${left.x},${left.y}`}
+              fill="none" stroke={stroke} strokeWidth="2"
             />
-            
-            {/* Internal divisions */}
-            <line x1="300" y1="80" x2="300" y2="520" stroke="#f59e0b" strokeWidth="2" />
-            <line x1="80" y1="300" x2="520" y2="300" stroke="#f59e0b" strokeWidth="2" />
-            <line x1="190" y1="190" x2="410" y2="410" stroke="#f59e0b" strokeWidth="2" />
-            <line x1="190" y1="410" x2="410" y2="190" stroke="#f59e0b" strokeWidth="2" />
-            
-            {/* House positions and content */}
-            {houses.map((house) => {
+
+            {/* ── Outer border rect ── */}
+            <rect x={T} y={T} width={S - T * 2} height={S - T * 2}
+              fill="none" stroke={stroke} strokeWidth={sw} />
+
+            {/* ── Cross lines (vertex to vertex) ── */}
+            <line x1={top.x}   y1={top.y}   x2={bottom.x} y2={bottom.y} stroke={stroke} strokeWidth={sw} />
+            <line x1={left.x}  y1={left.y}  x2={right.x}  y2={right.y}  stroke={stroke} strokeWidth={sw} />
+
+            {/* ── Inner diamond ── */}
+            <polygon
+              points={`${itl.x},${itl.y} ${itr.x},${itr.y} ${ibr.x},${ibr.y} ${ibl.x},${ibl.y}`}
+              fill="none" stroke={stroke} strokeWidth={sw}
+            />
+
+            {/* ── Corner to inner corner lines ── */}
+            {/* top-left corner → inner top-left */}
+            <line x1={T}     y1={T}     x2={itl.x} y2={itl.y} stroke={stroke} strokeWidth={sw} />
+            {/* top-right corner → inner top-right */}
+            <line x1={S-T}   y1={T}     x2={itr.x} y2={itr.y} stroke={stroke} strokeWidth={sw} />
+            {/* bottom-right corner → inner bottom-right */}
+            <line x1={S-T}   y1={S-T}   x2={ibr.x} y2={ibr.y} stroke={stroke} strokeWidth={sw} />
+            {/* bottom-left corner → inner bottom-left */}
+            <line x1={T}     y1={S-T}   x2={ibl.x} y2={ibl.y} stroke={stroke} strokeWidth={sw} />
+
+            {/* ── House content ── */}
+            {[1,2,3,4,5,6,7,8,9,10,11,12].map((house) => {
+              const center = houseCenters[house];
               const planets = getPlanetsInHouse(house);
-              const sign = getSignInHouse(house);
-              
-              let x, y, width = 100, height = 80;
-              
-              // Position calculation for North Indian diamond chart
-              switch(house) {
-                case 1: x = 250; y = 100; break;   // Top
-                case 2: x = 370; y = 140; break;   // Top-right
-                case 3: x = 430; y = 250; break;   // Right
-                case 4: x = 370; y = 360; break;   // Bottom-right
-                case 5: x = 250; y = 400; break;   // Bottom
-                case 6: x = 130; y = 360; break;   // Bottom-left
-                case 7: x = 70; y = 250; break;    // Left
-                case 8: x = 130; y = 140; break;   // Top-left
-                case 9: x = 190; y = 190; break;   // Inner top-left
-                case 10: x = 310; y = 190; break;  // Inner top-right
-                case 11: x = 310; y = 310; break;  // Inner bottom-right
-                case 12: x = 190; y = 310; break;  // Inner bottom-left
-                default: x = 300; y = 300; break;
-              }
-              
+              const sign    = getSignInHouse(house);
+              const lineH   = 16;
+              const totalLines = 1 + (sign ? 1 : 0) + planets.length;
+              const startY  = center.y - ((totalLines - 1) * lineH) / 2;
+
               return (
                 <g key={house}>
-                  {/* House background for better visibility */}
-                  <rect
-                    x={x - width/2}
-                    y={y - height/2}
-                    width={width}
-                    height={height}
-                    fill="rgba(245, 158, 11, 0.05)"
-                    stroke="rgba(245, 158, 11, 0.2)"
-                    strokeWidth="1"
-                    rx="8"
-                  />
-                  
                   {/* House number */}
                   <text
-                    x={x}
-                    y={y - 25}
-                    textAnchor="middle"
-                    className="fill-amber-300 text-sm font-bold"
-                    fontSize="14"
+                    x={center.x} y={startY}
+                    textAnchor="middle" dominantBaseline="middle"
+                    fontSize="13" fontWeight="bold"
+                    fill="rgba(245,158,11,0.9)"
                   >
                     {house}
                   </text>
-                  
+
                   {/* Sign */}
-                  <text
-                    x={x}
-                    y={y - 10}
-                    textAnchor="middle"
-                    className="fill-white text-xs"
-                    fontSize="11"
-                  >
-                    {sign}
-                  </text>
-                  
-                  {/* Planets */}
-                  {planets.map((planet, index) => (
+                  {sign && (
                     <text
-                      key={index}
-                      x={x}
-                      y={y + 5 + (index * 15)}
-                      textAnchor="middle"
-                      className="fill-orange-300 text-xs font-semibold"
-                      fontSize="12"
+                      x={center.x} y={startY + lineH}
+                      textAnchor="middle" dominantBaseline="middle"
+                      fontSize="10" fill="rgba(255,255,255,0.6)"
                     >
-                      {planet}
+                      {sign.slice(0, 3)}
+                    </text>
+                  )}
+
+                  {/* Planets */}
+                  {planets.map((planet, i) => (
+                    <text
+                      key={i}
+                      x={center.x}
+                      y={startY + lineH * (i + (sign ? 2 : 1))}
+                      textAnchor="middle" dominantBaseline="middle"
+                      fontSize="11" fontWeight="600"
+                      fill="#fb923c"
+                    >
+                      {abbr(planet)}
                     </text>
                   ))}
                 </g>
               );
             })}
           </svg>
+
+          {/* Legend */}
+          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+            {Object.entries(ABBR).slice(0, 9).map(([full, short]) => (
+              <span key={full} className="text-xs px-2 py-1 rounded-md"
+                style={{ background: 'rgba(245,158,11,0.08)', color: 'rgba(245,158,11,0.8)', border: '1px solid rgba(245,158,11,0.15)' }}>
+                {short} = {full}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     );
   };
 
-  // Planetary Positions Component
+  // ── Planetary Positions ────────────────────────────────────────────────────
   const PlanetaryPositions = () => {
     const planets = kundaliData?.data?.planets || [];
-    
+    const planetIcons = {
+      Sun: '☀️', Moon: '🌙', Mars: '♂️', Mercury: '☿', Jupiter: '♃',
+      Venus: '♀️', Saturn: '♄', Rahu: '☊', Ketu: '☋',
+    };
+
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {planets.map((planet, index) => (
-          <div
-            key={index}
-            className="p-6 border-2 border-amber-400/50 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:border-amber-400 hover:shadow-lg hover:scale-105"
+          <div key={index}
+            className="p-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]"
+            style={{
+              background: 'rgba(245,158,11,0.04)',
+              border: '1px solid rgba(245,158,11,0.2)',
+            }}
           >
-            <h3 className="text-amber-300 font-bold text-xl mb-4 text-center">{planet.name}</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-amber-300 font-medium">Sign:</span> 
-                <span className="text-white font-semibold">{planet.sign}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-amber-300 font-medium">House:</span> 
-                <span className="text-white font-semibold">{planet.house}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-amber-300 font-medium">Degree:</span> 
-                <span className="text-white font-semibold">{planet.degree}°</span>
-              </div>
-              {planet.nakshatra && (
-                <div className="flex justify-between">
-                  <span className="text-amber-300 font-medium">Nakshatra:</span> 
-                  <span className="text-white font-semibold">{planet.nakshatra}</span>
-                </div>
-              )}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">{planetIcons[planet.name] || '⭐'}</span>
+              <h3 className="text-amber-300 font-bold text-lg">{planet.name}</h3>
               {planet.retrograde && (
-                <div className="text-center">
-                  <span className="text-red-400 font-semibold text-xs px-2 py-1 bg-red-400/20 rounded-full">
-                    RETROGRADE
-                  </span>
-                </div>
+                <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-semibold"
+                  style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
+                  ℞
+                </span>
               )}
+            </div>
+            <div className="space-y-2 text-sm">
+              {[
+                ['Sign',       planet.sign],
+                ['House',      planet.house],
+                ['Degree',     planet.degree ? `${planet.degree}°` : null],
+                ['Nakshatra',  planet.nakshatra],
+              ].filter(([, v]) => v).map(([label, value]) => (
+                <div key={label} className="flex justify-between items-center">
+                  <span className="text-amber-400/70">{label}</span>
+                  <span className="text-white font-medium">{value}</span>
+                </div>
+              ))}
             </div>
           </div>
         ))}
@@ -196,74 +294,43 @@ const ShowKundali = () => {
     );
   };
 
-  // House Details Component
+  // ── House Details ──────────────────────────────────────────────────────────
   const HouseDetails = () => {
-    const houses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const houseNames = {
-      1: "Lagna (Ascendant)",
-      2: "Dhana (Wealth)",
-      3: "Sahaja (Siblings)",
-      4: "Sukha (Happiness)",
-      5: "Putra (Children)",
-      6: "Ripu (Enemies)",
-      7: "Kalatra (Spouse)",
-      8: "Ayur (Longevity)",
-      9: "Bhagya (Fortune)",
-      10: "Karma (Career)",
-      11: "Labha (Gains)",
-      12: "Vyaya (Losses)"
+      1: 'Lagna — Self & Body',        2: 'Dhana — Wealth & Family',
+      3: 'Sahaja — Siblings & Courage', 4: 'Sukha — Home & Mother',
+      5: 'Putra — Children & Mind',     6: 'Ripu — Enemies & Health',
+      7: 'Kalatra — Spouse & Partners', 8: 'Ayur — Longevity & Occult',
+      9: 'Bhagya — Fortune & Dharma',  10: 'Karma — Career & Fame',
+      11: 'Labha — Gains & Friends',   12: 'Vyaya — Losses & Moksha',
     };
 
-    const houseMeanings = {
-      1: "Self, personality, physical appearance, health",
-      2: "Money, family, speech, food, values",
-      3: "Siblings, courage, short journeys, communication",
-      4: "Home, mother, education, property, happiness",
-      5: "Children, creativity, intelligence, romance",
-      6: "Enemies, diseases, debts, service, daily routine",
-      7: "Marriage, partnerships, business, spouse",
-      8: "Longevity, transformation, occult, inheritance",
-      9: "Luck, higher learning, spirituality, father",
-      10: "Career, reputation, status, public image",
-      11: "Gains, friends, elder siblings, aspirations",
-      12: "Losses, expenses, foreign travels, liberation"
-    };
-    
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {houses.map((house) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[1,2,3,4,5,6,7,8,9,10,11,12].map((house) => {
           const planets = getPlanetsInHouse(house);
-          const sign = getSignInHouse(house);
-          
+          const sign    = getSignInHouse(house);
           return (
-            <div
-              key={house}
-              className="p-6 border-2 border-amber-400/50 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:border-amber-400"
+            <div key={house}
+              className="p-5 rounded-xl backdrop-blur-sm transition-all duration-300"
+              style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}
             >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-amber-300 font-bold text-xl">
-                  House {house}
-                </h3>
-                <span className="text-xs text-gray-400 text-right leading-tight max-w-[120px]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-amber-400 font-bold text-lg">House {house}</span>
+                <span className="text-xs text-gray-400 text-right leading-snug max-w-[160px]">
                   {houseNames[house]}
                 </span>
               </div>
-              
-              <div className="space-y-3">
+              <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-amber-300 font-medium">Sign:</span>
-                  <span className="text-white font-semibold">{sign}</span>
+                  <span className="text-gray-400">Sign</span>
+                  <span className="text-white font-medium">{sign || '—'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-amber-300 font-medium">Planets:</span>
-                  <span className="text-white font-semibold">
-                    {planets.length > 0 ? planets.join(', ') : 'None'}
+                  <span className="text-gray-400">Planets</span>
+                  <span className="text-orange-300 font-medium text-right max-w-[180px]">
+                    {planets.length > 0 ? planets.join(', ') : 'Empty'}
                   </span>
-                </div>
-                <div className="mt-3 pt-3 border-t border-white/20">
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    <span className="text-amber-300 font-medium">Significance:</span> {houseMeanings[house]}
-                  </p>
                 </div>
               </div>
             </div>
@@ -273,148 +340,114 @@ const ShowKundali = () => {
     );
   };
 
-  // Birth Details Component
+  // ── Birth Details ──────────────────────────────────────────────────────────
   const BirthDetails = () => {
     const birthData = kundaliData?.data?.birth_details || {};
-    
+    const fields = [
+      ['Full Name',      name || birthData.name || '—'],
+      ['Date of Birth',  birthDetails?.date || birthData.date || '—'],
+      ['Time of Birth',  birthDetails?.time || birthData.time || '—'],
+      ['Place of Birth', birthDetails?.place || birthData.place || '—'],
+      ['Latitude',       birthData.latitude || '—'],
+      ['Longitude',      birthData.longitude || '—'],
+      ['Timezone',       birthData.timezone || '—'],
+    ];
+
     return (
-      <div className="space-y-8">
-        <div className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm border border-white/20">
-          <h3 className="text-3xl font-bold text-amber-300 mb-6 text-center">Birth Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="p-4 bg-white/5 rounded-xl">
-                <span className="text-amber-300 font-semibold block mb-2">Full Name:</span>
-                <p className="text-white text-lg">{name || birthData.name || 'Not provided'}</p>
+      <div className="space-y-6">
+        {/* Birth info */}
+        <div className="rounded-2xl p-7 backdrop-blur-sm"
+          style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+          <h3 className="text-xl font-bold text-amber-300 mb-5">Birth Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {fields.map(([label, value]) => (
+              <div key={label} className="flex justify-between items-center p-3 rounded-lg"
+                style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <span className="text-amber-400/70 text-sm">{label}</span>
+                <span className="text-white font-medium text-sm text-right max-w-[55%]">{value}</span>
               </div>
-              <div className="p-4 bg-white/5 rounded-xl">
-                <span className="text-amber-300 font-semibold block mb-2">Date of Birth:</span>
-                <p className="text-white text-lg">{birthDetails?.date || birthData.date || 'Not available'}</p>
-              </div>
-              <div className="p-4 bg-white/5 rounded-xl">
-                <span className="text-amber-300 font-semibold block mb-2">Time of Birth:</span>
-                <p className="text-white text-lg">{birthDetails?.time || birthData.time || 'Not available'}</p>
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div className="p-4 bg-white/5 rounded-xl">
-                <span className="text-amber-300 font-semibold block mb-2">Place of Birth:</span>
-                <p className="text-white text-lg">{birthDetails?.place || birthData.place || 'Not available'}</p>
-              </div>
-              <div className="p-4 bg-white/5 rounded-xl">
-                <span className="text-amber-300 font-semibold block mb-2">Coordinates:</span>
-                <p className="text-white">
-                  <span className="block">Latitude: {birthData.latitude || 'Not available'}</span>
-                  <span className="block">Longitude: {birthData.longitude || 'Not available'}</span>
-                </p>
-              </div>
-              <div className="p-4 bg-white/5 rounded-xl">
-                <span className="text-amber-300 font-semibold block mb-2">Timezone:</span>
-                <p className="text-white text-lg">{birthData.timezone || 'Not available'}</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Chart Summary */}
-        <div className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm border border-white/20">
-          <h3 className="text-2xl font-bold text-amber-300 mb-6 text-center">Chart Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-300">
-              <h4 className="text-amber-300 font-semibold mb-3 text-lg">Ascendant (Lagna)</h4>
-              <p className="text-white text-xl font-bold">{getSignInHouse(1) || 'Not available'}</p>
-              <p className="text-gray-300 text-sm mt-2">Your rising sign</p>
-            </div>
-            <div className="text-center p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-300">
-              <h4 className="text-amber-300 font-semibold mb-3 text-lg">Moon Sign</h4>
-              <p className="text-white text-xl font-bold">
-                {kundaliData?.data?.planets?.find(p => p.name === 'Moon')?.sign || 'Not available'}
-              </p>
-              <p className="text-gray-300 text-sm mt-2">Your emotional nature</p>
-            </div>
-            <div className="text-center p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-300">
-              <h4 className="text-amber-300 font-semibold mb-3 text-lg">Sun Sign</h4>
-              <p className="text-white text-xl font-bold">
-                {kundaliData?.data?.planets?.find(p => p.name === 'Sun')?.sign || 'Not available'}
-              </p>
-              <p className="text-gray-300 text-sm mt-2">Your core identity</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Insights */}
-        <div className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm border border-white/20">
-          <h3 className="text-2xl font-bold text-amber-300 mb-6 text-center">Quick Insights</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-amber-300">Planetary Strengths</h4>
-              {kundaliData?.data?.planets?.slice(0, 4).map((planet, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                  <span className="text-white font-medium">{planet.name}</span>
-                  <span className="text-amber-300">{planet.sign}</span>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-amber-300">Houses with Planets</h4>
-              {[1, 7, 10, 4].map(house => {
-                const planets = getPlanetsInHouse(house);
-                return (
-                  <div key={house} className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                    <span className="text-white font-medium">House {house}</span>
-                    <span className="text-amber-300 text-sm">
-                      {planets.length > 0 ? planets.join(', ') : 'Empty'}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+        {/* Chart summary */}
+        <div className="rounded-2xl p-7 backdrop-blur-sm"
+          style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+          <h3 className="text-xl font-bold text-amber-300 mb-5">Chart Summary</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { label: 'Ascendant (Lagna)', value: getSignInHouse(1),  sub: 'Rising sign' },
+              { label: 'Moon Sign (Rashi)', value: kundaliData?.data?.planets?.find(p => p.name === 'Moon')?.sign, sub: 'Emotional self' },
+              { label: 'Sun Sign',          value: kundaliData?.data?.planets?.find(p => p.name === 'Sun')?.sign,  sub: 'Core identity' },
+            ].map(({ label, value, sub }) => (
+              <div key={label} className="text-center p-5 rounded-xl"
+                style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <p className="text-amber-400/70 text-xs uppercase tracking-wider mb-2">{label}</p>
+                <p className="text-white text-2xl font-bold mb-1">{value || '—'}</p>
+                <p className="text-gray-500 text-xs">{sub}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     );
   };
 
+  // ── Tabs config ────────────────────────────────────────────────────────────
+  const tabs = [
+    { id: 'chart',   label: 'Birth Chart',  icon: '🔮' },
+    { id: 'planets', label: 'Planets',      icon: '🪐' },
+    { id: 'houses',  label: 'Houses',       icon: '🏠' },
+    { id: 'birth',   label: 'Details',      icon: '📋' },
+  ];
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-900 text-white overflow-hidden">
+    <div className="relative min-h-screen text-white overflow-hidden"
+      style={{ background: 'linear-gradient(135deg,#050810 0%,#0a0f1e 30%,#0d1225 60%,#080d1a 100%)' }}>
+
+      <AmbientGlow />
+      <ZodiacRing />
       <Stars />
       <DecorativeElement />
       <BottomDecorativeElement />
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        {/* Header */}
+      <div className="container mx-auto px-4 py-16 relative z-10 max-w-6xl">
+
+        {/* ── Header ── */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 bg-clip-text text-transparent mb-4">
-            {name ? `${name}'s Kundali` : "Your Kundali"}
+          <p className="text-amber-400/50 tracking-[0.25em] text-sm mb-2 uppercase">Janam Kundali</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3"
+            style={{
+              background: 'linear-gradient(135deg,#fde68a 0%,#f59e0b 50%,#fb923c 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>
+            {name ? `${name}'s Kundali` : 'Your Kundali'}
           </h1>
-          <p className="text-xl text-gray-300 max-w-5xl mx-auto">
-            Explore your Vedic birth chart and discover the cosmic influences on your life
+          <p className="text-gray-400 max-w-xl mx-auto mb-5">
+            {birthDetails ? `${birthDetails.date} • ${birthDetails.time} • ${birthDetails.place}` : 'Vedic birth chart'}
           </p>
           <button
-            onClick={() => navigate('/')}
-            className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/30 rounded-full text-sm transition-all duration-300"
+            onClick={() => navigate('/GenerateKundali')}
+            className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105"
+            style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#fbbf24' }}
           >
             ← Generate New Kundali
           </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex justify-center mb-12">
-          <div className="backdrop-blur-sm bg-white/10 border border-white/20 flex gap-6 p-5 rounded-full shadow-2xl">
-            {[
-              { id: 'chart', label: 'Birth Chart', icon: '🔮' },
-              { id: 'planets', label: 'Planets', icon: '🪐' },
-              { id: 'houses', label: 'Houses', icon: '🏠' },
-              { id: 'birth', label: 'Details', icon: '📋' }
-            ].map((tab) => (
+        {/* ── Tabs ── */}
+        <div className="flex justify-center mb-10">
+          <div className="flex gap-2 p-1.5 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'bg-amber-500 text-black shadow-lg transform scale-105'
-                    : 'text-white hover:bg-white/10 hover:scale-105'
-                }`}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300"
+                style={activeTab === tab.id
+                  ? { background: '#f59e0b', color: '#000', boxShadow: '0 4px 15px rgba(245,158,11,0.4)' }
+                  : { color: 'rgba(255,255,255,0.6)' }}
               >
                 <span>{tab.icon}</span>
                 <span className="hidden sm:inline">{tab.label}</span>
@@ -423,87 +456,56 @@ const ShowKundali = () => {
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="max-w-7xl mx-auto">
+        {/* ── Content ── */}
+        <div>
           {activeTab === 'chart' && (
-            <div className="bg-white/10 p-10 rounded-2xl backdrop-blur-md border border-white/20">
-              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                Vedic Birth Chart (Rasi Chart)
+            <div className="rounded-2xl p-6 md:p-10 backdrop-blur-md"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+              <h2 className="text-2xl font-bold text-center text-amber-300 mb-8">
+                North Indian Rasi Chart
               </h2>
               <VedicChart />
-              <div className="text-center text-gray-300 mt-8 space-y-2">
-                <p className="text-lg">This is your North Indian style birth chart showing planetary positions</p>
-                <p className="text-sm">Houses are numbered 1-12, with zodiac signs and planets displayed in each house</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 p-6 bg-white/5 rounded-xl">
-                  <div className="text-center">
-                    <span className="text-amber-300 font-semibold">Chart Style:</span>
-                    <p className="text-white">North Indian Diamond</p>
+              <div className="mt-8 grid grid-cols-3 gap-4 text-center text-sm">
+                {[
+                  ['Chart Style', 'North Indian'],
+                  ['Chart Type',  'Rasi (D-1)'],
+                  ['Ayanamsa',    'Lahiri'],
+                ].map(([label, value]) => (
+                  <div key={label} className="p-3 rounded-xl"
+                    style={{ background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.1)' }}>
+                    <p className="text-amber-400/60 text-xs mb-1">{label}</p>
+                    <p className="text-white font-semibold">{value}</p>
                   </div>
-                  <div className="text-center">
-                    <span className="text-amber-300 font-semibold">Chart Type:</span>
-                    <p className="text-white">Rasi Chart (D-1)</p>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-amber-300 font-semibold">Ayanamsa:</span>
-                    <p className="text-white">Lahiri</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           )}
 
           {activeTab === 'planets' && (
-            <div className="bg-white/10 p-10 rounded-2xl backdrop-blur-md border border-white/20">
-              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                Planetary Positions
-              </h2>
+            <div className="rounded-2xl p-6 md:p-10 backdrop-blur-md"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+              <h2 className="text-2xl font-bold text-center text-amber-300 mb-8">Planetary Positions</h2>
               <PlanetaryPositions />
-              <div className="mt-8 p-6 bg-white/5 rounded-xl">
-                <h3 className="text-lg font-semibold text-amber-300 mb-4">Understanding Planetary Positions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-                  <div>
-                    <p><strong className="text-amber-300">Sign:</strong> The zodiac sign where the planet is placed</p>
-                    <p><strong className="text-amber-300">Degree:</strong> Exact position within the sign (0°-30°)</p>
-                  </div>
-                  <div>
-                    <p><strong className="text-amber-300">House:</strong> The life area influenced by the planet</p>
-                    <p><strong className="text-amber-300">Nakshatra:</strong> Lunar mansion (for Moon)</p>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
           {activeTab === 'houses' && (
-            <div className="bg-white/10 p-10 rounded-2xl backdrop-blur-md border border-white/20">
-              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                House Analysis
-              </h2>
+            <div className="rounded-2xl p-6 md:p-10 backdrop-blur-md"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+              <h2 className="text-2xl font-bold text-center text-amber-300 mb-8">House Analysis</h2>
               <HouseDetails />
-              <div className="mt-8 p-6 bg-white/5 rounded-xl">
-                <h3 className="text-lg font-semibold text-amber-300 mb-4">House System Explained</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  In Vedic astrology, the 12 houses represent different areas of life. Each house has a specific meaning and the planets placed in these houses influence those life areas. The sign on each house cusp (beginning) also provides additional insights into how you approach these life themes.
-                </p>
-              </div>
             </div>
           )}
 
           {activeTab === 'birth' && (
-            <div>
-              <BirthDetails />
-            </div>
+            <BirthDetails />
           )}
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-16 max-w-7xl mx-auto p-6 bg-white/5 rounded-xl border border-white/10">
-          <p className="text-gray-400 text-sm">
-            Generated using Vedic Astrology principles • For entertainment and educational purposes
-          </p>
-          <p className="text-gray-500 text-xs mt-2">
-            Consult a qualified astrologer for detailed interpretation
-          </p>
+        {/* ── Footer ── */}
+        <div className="text-center mt-14 text-gray-600 text-xs">
+          <p>Generated using Vedic Astrology • Lahiri Ayanamsa • For educational purposes</p>
+          <p className="mt-1">Consult a qualified Jyotishi for detailed interpretation</p>
         </div>
       </div>
     </div>

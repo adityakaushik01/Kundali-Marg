@@ -10,6 +10,10 @@ import BottomDecorativeElement from "../components/BottomDecorativeElement";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
 import { useNavigate } from 'react-router-dom';
+import ZodiacRing from "../components/ZodiacRing";
+import AmbientGlow from "../components/AmbientGlow";
+
+const API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
 
 const darkTheme = createTheme({
   palette: {
@@ -236,34 +240,45 @@ const GenerateKundali = () => {
     if (error) setError(""); // Clear error when user makes changes
   };
 
-  const handleSearch = async (value) => {
-    handleChange("address", value);
-    if (value.length < 3) {
+ const handleSearch = async (value) => {
+  handleChange("address", value);
+
+  if (value.length < 3) {
+    setSuggestions([]);
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${value}&limit=5&apiKey=${API_KEY}`
+    );
+
+    const data = await res.json();
+
+    if (data.features) {
+      setSuggestions(data.features);
+    } else {
       setSuggestions([]);
-      return;
     }
-    
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${value}&limit=5`
-      );
-      const data = await res.json();
-      setSuggestions(data);
-    } catch (error) {
-      console.error("Error fetching location suggestions:", error);
-      setSuggestions([]);
-    }
-  };
+
+  } catch (error) {
+    console.error("Error fetching location suggestions:", error);
+    setSuggestions([]);
+  }
+};
 
   const handleSelectSuggestion = (suggestion) => {
-    setFormData((prev) => ({
-      ...prev,
-      address: suggestion.display_name,
-      latitude: parseFloat(suggestion.lat),
-      longitude: parseFloat(suggestion.lon),
-    }));
-    setSuggestions([]);
-  };
+  const suggestionProps = suggestion.properties;
+
+  setFormData((prev) => ({
+    ...prev,
+    address: `${suggestionProps.city || suggestionProps.name}, ${suggestionProps.state}, ${suggestionProps.country}`,
+    latitude: suggestionProps.lat,
+    longitude: suggestionProps.lon,
+  }));
+
+  setSuggestions([]);
+};
 
   const validateForm = () => {
     if (!formData.name.trim()) {
@@ -367,6 +382,8 @@ const GenerateKundali = () => {
       <Stars />
       <DecorativeElement />
       <BottomDecorativeElement />
+      <ZodiacRing />
+      <AmbientGlow />
 
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="text-center mb-12">
@@ -494,9 +511,9 @@ const GenerateKundali = () => {
                       onClick={() => handleSelectSuggestion(item)}
                       className="p-4 hover:bg-amber-500/20 cursor-pointer text-white border-b border-white/10 last:border-b-0 transition-colors duration-200"
                     >
-                      <div className="font-medium text-sm">{item.display_name}</div>
+                      <div className="font-medium text-sm">{item.properties.formatted}</div>
                       <div className="text-xs text-gray-400 mt-1">
-                        Lat: {parseFloat(item.lat).toFixed(4)}, Lon: {parseFloat(item.lon).toFixed(4)}
+                        Lat: {parseFloat(item.properties.lat).toFixed(4)}, Lon: {parseFloat(item.properties.lon).toFixed(4)}
                       </div>
                     </div>
                   ))}

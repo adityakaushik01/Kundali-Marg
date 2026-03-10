@@ -4,20 +4,18 @@ import Stars from "../components/Stars";
 import DecorativeElement from "../components/DecorativeElement";
 import BottomDecorativeElement from "../components/BottomDecorativeElement";
 import { Link } from "react-router-dom";
+import ZodiacRing from "../components/ZodiacRing";
+import AmbientGlow from "../components/AmbientGlow";
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-800 to-teal-900 text-white relative overflow-hidden">
-      {/* Animated Stars Background */}
       <Stars />
-
-      {/* Decorative Elements */}
       <DecorativeElement />
-
-      {/* Navigation */}
+      <ZodiacRing />
+      <AmbientGlow />
       <Navbar />
 
-      {/* Hero Section */}
       <section className="relative z-10 text-center px-6 md:py-6">
         <h1 className="text-5xl md:text-7xl font-light mb-8 tracking-wider">
           GET <span className="font-normal">CLARITY,</span>
@@ -85,8 +83,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Bottom decorative elements */}
       <BottomDecorativeElement />
     </div>
   );
