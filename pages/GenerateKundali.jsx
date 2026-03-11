@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import { useNavigate } from 'react-router-dom';
 import ZodiacRing from "../components/ZodiacRing";
 import AmbientGlow from "../components/AmbientGlow";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
 
@@ -333,7 +334,7 @@ const GenerateKundali = () => {
       console.log("Sending kundali request:", kundaliDataInput);
 
       // Call your local backend API
-      const response = await fetch('http://localhost:5000/api/kundli', {
+      const response = await fetch(`${BACKEND_URL}/api/kundli`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
