@@ -222,7 +222,14 @@ const buildRasiChart = (houseMap) => {
 
 // ── Main Calculator ───────────────────────────────────────────────────────────
 
-export const calculateAccurateKundali = async ({ datetime, latitude, longitude, name }) => {
+export const calculateAccurateKundali = async ({
+  datetime,
+  latitude,
+  longitude,
+  name,
+  timezone,
+  timezoneOffset
+}) => {
   try {
     // Set ephemeris path (swisseph bundled data)
     swisseph.swe_set_ephe_path('./node_modules/swisseph/ephe');
@@ -297,15 +304,16 @@ export const calculateAccurateKundali = async ({ datetime, latitude, longitude, 
 
     // Build birth details
     const birthDetails = {
-      name,
-      datetime: datetime.toISOString(),
-      latitude: parseFloat(latitude.toFixed(4)),
-      longitude: parseFloat(longitude.toFixed(4)),
-      julianDay: parseFloat(jd.toFixed(4)),
-      ayanamsa: parseFloat(ayanamsa.toFixed(4)),
-      ayanamsaName: 'Lahiri',
-      timezone: 'UTC',
-    };
+  name,
+  datetime_utc: datetime.toISOString(),
+  latitude: parseFloat(latitude.toFixed(4)),
+  longitude: parseFloat(longitude.toFixed(4)),
+  julianDay: parseFloat(jd.toFixed(4)),
+  ayanamsa: parseFloat(ayanamsa.toFixed(4)),
+  ayanamsaName: 'Lahiri',
+  timezone,
+  timezoneOffset
+};
 
     return {
       status: 'success',
