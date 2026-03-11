@@ -52,8 +52,9 @@ app.use('/api/kundli', kundliLimiter);
 // ── GET / ─────────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({
-    message: 'Kundali Marg Backend is running',
-    status: 'online',
+    message: "🔮 Kundali Marg API is running",
+    status: "online",
+    frontend: "https://kundali-marg.vercel.app"
   });
 });
 
@@ -146,13 +147,12 @@ app.post('/api/kundli', async (req, res) => {
     console.log('Kundali calculation completed successfully');
 
     kundaliData.request_info = {
-      processed_at: new Date().toISOString(),
-      coordinates: { latitude: lat, longitude: lng },
-      birth_datetime_utc: birthDate.toISOString(),
-      timezone,
-      timezone_offset: timezoneOffset,
-      calculation_method: 'Swiss Ephemeris + Vedic Astrology'
-    };
+  processed_at: new Date().toISOString(),
+  birth_datetime_utc: birthDate.toISOString(),
+  timezone,
+  timezone_offset: timezoneOffset,
+  coordinates: { latitude: lat, longitude: lng }
+};
 
     res.json(kundaliData);
 

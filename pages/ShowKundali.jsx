@@ -259,11 +259,7 @@ const ShowKundali = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {planets.map((planet, index) => (
           <div key={index}
-            className="p-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]"
-            style={{
-              background: 'rgba(245,158,11,0.04)',
-              border: '1px solid rgba(245,158,11,0.2)',
-            }}
+            className="p-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] border border-white/20 bg-white/5"
           >
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">{planetIcons[planet.name] || '⭐'}</span>
@@ -312,8 +308,7 @@ const ShowKundali = () => {
           const sign    = getSignInHouse(house);
           return (
             <div key={house}
-              className="p-5 rounded-xl backdrop-blur-sm transition-all duration-300"
-              style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}
+              className="p-5 rounded-xl backdrop-blur-sm border border-white/20 bg-white/5"
             >
               <div className="flex justify-between items-start mb-3">
                 <span className="text-amber-400 font-bold text-lg">House {house}</span>
@@ -356,8 +351,7 @@ const ShowKundali = () => {
     return (
       <div className="space-y-6">
         {/* Birth info */}
-        <div className="rounded-2xl p-7 backdrop-blur-sm"
-          style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+        <div className="p-5 rounded-xl backdrop-blur-sm border border-white/20 bg-white/5">
           <h3 className="text-xl font-bold text-amber-300 mb-5">Birth Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {fields.map(([label, value]) => (
@@ -371,8 +365,7 @@ const ShowKundali = () => {
         </div>
 
         {/* Chart summary */}
-        <div className="rounded-2xl p-7 backdrop-blur-sm"
-          style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+        <div className="p-5 rounded-xl backdrop-blur-sm border border-white/20 bg-white/5">
           <h3 className="text-xl font-bold text-amber-300 mb-5">Chart Summary</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
@@ -403,8 +396,7 @@ const ShowKundali = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen text-white overflow-hidden"
-      style={{ background: 'linear-gradient(135deg,#050810 0%,#0a0f1e 30%,#0d1225 60%,#080d1a 100%)' }}>
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-900 text-white overflow-x-hidden">
 
       <AmbientGlow />
       <ZodiacRing />
@@ -444,7 +436,7 @@ const ShowKundali = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300"
+                className="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 hover:bg-white/10"
                 style={activeTab === tab.id
                   ? { background: '#f59e0b', color: '#000', boxShadow: '0 4px 15px rgba(245,158,11,0.4)' }
                   : { color: 'rgba(255,255,255,0.6)' }}
@@ -459,8 +451,7 @@ const ShowKundali = () => {
         {/* ── Content ── */}
         <div>
           {activeTab === 'chart' && (
-            <div className="rounded-2xl p-6 md:p-10 backdrop-blur-md"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+            <div className="rounded-2xl p-6 md:p-10 backdrop-blur-md border border-white/20 bg-white/5">
               <h2 className="text-2xl font-bold text-center text-amber-300 mb-8">
                 North Indian Rasi Chart
               </h2>

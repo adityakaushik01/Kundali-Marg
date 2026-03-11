@@ -231,6 +231,8 @@ const GenerateKundali = () => {
     address: "",
     latitude: null,
     longitude: null,
+    timezone: null,
+    timezoneOffset: null
   });
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -269,13 +271,17 @@ const GenerateKundali = () => {
 };
 
   const handleSelectSuggestion = (suggestion) => {
+    console.log("suggestion", suggestion);
   const suggestionProps = suggestion.properties;
+  console.log("suggestionProps", suggestionProps);
 
   setFormData((prev) => ({
     ...prev,
     address: `${suggestionProps.city || suggestionProps.name}, ${suggestionProps.state}, ${suggestionProps.country}`,
     latitude: suggestionProps.lat,
     longitude: suggestionProps.lon,
+    timezone: suggestionProps.timezone?.name,
+    timezoneOffset: suggestionProps.timezone?.offset_STD_seconds
   }));
 
   setSuggestions([]);
@@ -328,7 +334,9 @@ const GenerateKundali = () => {
         datetime: combinedDateTime.toISOString(),
         latitude: formData.latitude,
         longitude: formData.longitude,
-        name: formData.name.trim()
+        name: formData.name.trim(),
+        timezone: formData.timezone,
+        timezoneOffset: formData.timezoneOffset,
       };
 
       console.log("Sending kundali request:", kundaliDataInput);
@@ -379,7 +387,7 @@ const GenerateKundali = () => {
   const [openTime, setOpenTime] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-900 text-white overflow-hidden">
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-900 text-white overflow-x-hidden">
       <Stars />
       <DecorativeElement />
       <BottomDecorativeElement />
@@ -399,7 +407,7 @@ const GenerateKundali = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="max-w-2xl mx-auto p-10 rounded-2xl shadow-2xl backdrop-blur-md border border-white/20 bg-white/5"
+          className="relative z-20 max-w-2xl mx-auto p-10 rounded-2xl shadow-2xl backdrop-blur-md border border-white/20 bg-white/5"
         >
           {error && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl">
@@ -505,7 +513,7 @@ const GenerateKundali = () => {
                 required
               />
               {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl max-h-64 overflow-y-auto z-50 border border-amber-400/30">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl max-h-64 overflow-y-auto z-[999] border border-amber-400/30">
                   {suggestions.map((item, index) => (
                     <div
                       key={index}
