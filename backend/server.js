@@ -144,7 +144,7 @@ app.post('/api/kundli', async (req, res) => {
       name: (name || '').trim() || 'User'
     });
 
-    console.log('Kundali calculation completed successfully', kundaliData);
+    console.log('Kundali calculation completed successfully', JSON.stringify(kundaliData, null, 2));
 
     kundaliData.request_info = {
   processed_at: new Date().toISOString(),
