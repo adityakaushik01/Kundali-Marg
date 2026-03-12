@@ -45,7 +45,7 @@ const PLANETS = {
   Jupiter: swisseph.SE_JUPITER,
   Venus:   swisseph.SE_VENUS,
   Saturn:  swisseph.SE_SATURN,
-  Rahu:    swisseph.SE_MEAN_NODE,  // North Node = Rahu
+  Rahu:    swisseph.SE_TRUE_NODE,  // North Node = Rahu
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
