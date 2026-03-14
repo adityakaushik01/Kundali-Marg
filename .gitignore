@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 *.env
 apikeys.txt
+chartsvg.txt
