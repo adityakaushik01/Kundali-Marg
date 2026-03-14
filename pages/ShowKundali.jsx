@@ -5,7 +5,15 @@ import DecorativeElement from "../components/DecorativeElement";
 import BottomDecorativeElement from "../components/BottomDecorativeElement";
 import ZodiacRing from "../components/ZodiacRing";
 import AmbientGlow from "../components/AmbientGlow";
-
+import SunImage from "../src/assets/planets-icon/sun.png";
+import MoonImage from "../src/assets/planets-icon/moon.png";
+import MarsImage from "../src/assets/planets-icon/mars.png";
+import MercuryImage from "../src/assets/planets-icon/mercury.png";
+import JupiterImage from "../src/assets/planets-icon/jupiter.png";
+import VenusImage from "../src/assets/planets-icon/venus.png";
+import SaturnImage from "../src/assets/planets-icon/saturn.png";
+import RahuImage from "../src/assets/planets-icon/rahu.png";
+import KetuImage from "../src/assets/planets-icon/ketu.png";
 // ── Language data ──────────────────────────────────────────────────────────────
 const LANG = {
   en: {
@@ -44,6 +52,35 @@ const LANG = {
       "Capricorn",
       "Aquarius",
       "Pisces",
+    ],
+    nakshatras: [
+      "Ashwini",
+      "Bharani",
+      "Krittika",
+      "Rohini",
+      "Mrigashira",
+      "Ardra",
+      "Punarvasu",
+      "Pushya",
+      "Ashlesha",
+      "Magha",
+      "Purva Phalguni",
+      "Uttara Phalguni",
+      "Hasta",
+      "Chitra",
+      "Swati",
+      "Vishakha",
+      "Anuradha",
+      "Jyeshtha",
+      "Mula",
+      "Purva Ashadha",
+      "Uttara Ashadha",
+      "Shravana",
+      "Dhanishtha",
+      "Shatabhisha",
+      "Purva Bhadrapada",
+      "Uttara Bhadrapada",
+      "Revati",
     ],
     asc: "Asc",
     chartTitle: "North Indian Rasi Chart",
@@ -86,16 +123,41 @@ const LANG = {
       "कुम्भ",
       "मीन",
     ],
+    nakshatras: [
+      "अश्विनी",
+      "भरणी",
+      "कृत्तिका",
+      "रोहिणी",
+      "मृगशिरा",
+      "आर्द्रा",
+      "पुनर्वसु",
+      "पुष्य",
+      "आश्लेषा",
+      "मघा",
+      "पूर्व फाल्गुनी",
+      "उत्तर फाल्गुनी",
+      "हस्त",
+      "चित्रा",
+      "स्वाती",
+      "विशाखा",
+      "अनुराधा",
+      "ज्येष्ठा",
+      "मूल",
+      "पूर्वाषाढ़",
+      "उत्तराषाढ़",
+      "श्रवण",
+      "धनिष्ठा",
+      "शतभिषा",
+      "पूर्व भाद्रपद",
+      "उत्तर भाद्रपद",
+      "रेवती",
+    ],
     asc: "लग्न",
     chartTitle: "उत्तर भारतीय राशि कुंडली",
     lagnaLabel: "लग्न",
   },
 };
 
-// ── Fixed SVG cell config (from prokerala reference, exact pixel positions) ────
-// sign label: x,y where the sign number is written
-// planet zone: col0/col1 = x of left/right column, py = first row y, step = 20px
-// When col0 === col1 → single column, all planets stack vertically
 const SIGN_POS = {
   1: { x: 241, y: 216 },
   2: { x: 123, y: 98 },
@@ -136,6 +198,13 @@ const ShowKundali = () => {
   const [lang, setLang] = useState("en"); // 'en' | 'hi'
 
   const L = LANG[lang];
+
+  const getNakshatraDisplay = (englishName) => {
+    const idx = LANG.en.nakshatras.findIndex(
+      (n) => n.toLowerCase() === englishName?.toLowerCase(),
+    );
+    return idx >= 0 ? L.nakshatras[idx] : englishName || "—";
+  };
 
   // ── No data guard ──────────────────────────────────────────────────────────
   if (!kundaliData || !kundaliData.data) {
@@ -184,9 +253,6 @@ const ShowKundali = () => {
 
   // ── VedicChart ─────────────────────────────────────────────────────────────
   const VedicChart = () => {
-    // FIX: planet placement
-    // If col0 === col1 → single column, stack all items vertically at col0
-    // If col0 !== col1 → 2 columns: first ceil(n/2) in col0, rest in col1
     const renderPlanets = (h) => {
       const data = getHouse(h);
       const zone = PLANET_ZONE[h];
@@ -256,7 +322,7 @@ const ShowKundali = () => {
     };
 
     return (
-      <div style={{ width: "100%", maxWidth: "420px", margin: "0 auto" }}>
+      <div style={{ width: "100%", maxWidth: "500px", margin: "0 auto" }}>
         <svg
           preserveAspectRatio="none"
           viewBox="0 0 480 480"
@@ -408,19 +474,22 @@ const ShowKundali = () => {
     );
   };
 
+  const getSignLord = (name) => (lang === "hi" ? (L.full[name] ?? name) : name);
+  const getNakLord = (name) => (lang === "hi" ? (L.full[name] ?? name) : name);
+
   // ── PlanetaryPositions ─────────────────────────────────────────────────────
   const PlanetaryPositions = () => {
     const planets = kundaliData?.data?.planets || [];
     const icons = {
-      Sun: "☀️",
-      Moon: "🌙",
-      Mars: "♂️",
-      Mercury: "☿",
-      Jupiter: "♃",
-      Venus: "♀️",
-      Saturn: "♄",
-      Rahu: "☊",
-      Ketu: "☋",
+      Sun: SunImage,
+      Moon: MoonImage,
+      Mars: MarsImage,
+      Mercury: MercuryImage,
+      Jupiter: JupiterImage,
+      Venus: VenusImage,
+      Saturn: SaturnImage,
+      Rahu: RahuImage,
+      Ketu: KetuImage,
     };
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -429,8 +498,20 @@ const ShowKundali = () => {
             key={i}
             className="p-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] border border-white/20 bg-white/5"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">{icons[planet.name] || "⭐"}</span>
+            <div
+              className="flex items-center gap-3 mb-4"
+              style={{ minHeight: "56px" }}
+            >
+              <img
+                src={icons[planet.name]}
+                alt={planet.name}
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  objectFit: "contain",
+                  flexShrink: 0,
+                }}
+              />
               <h3 className="text-amber-300 font-bold text-lg">
                 {lang === "hi" ? L.full[planet.name] : planet.name}
               </h3>
@@ -455,10 +536,26 @@ const ShowKundali = () => {
                 ],
                 [lang === "hi" ? "भाव" : "House", planet.house],
                 [
+                  lang === "hi" ? "राशि स्वामी" : "Sign Lord",
+                  getSignLord(planet.signLord),
+                ],
+                [
                   lang === "hi" ? "अंश" : "Degree",
                   planet.degree ? `${planet.degree}°` : null,
                 ],
-                [lang === "hi" ? "नक्षत्र" : "Nakshatra", planet.nakshatra],
+                [
+                  lang === "hi" ? "नक्षत्र" : "Nakshatra",
+                  getNakshatraDisplay(planet.nakshatra),
+                ],
+                [
+                  lang === "hi" ? "नक्षत्र पद" : "Nakshatra Pada",
+                  planet.degree ? `${planet.nakshatraPada}°` : null,
+                ],
+                [
+                  lang === "hi" ? "नक्षत्र स्वामी" : "Nakshatra Lord",
+                  getNakLord(planet.nakshatraLord),
+                ],
+                // [lang==='hi'?'गति'        :'Speed',          `${Math.abs(planet.speed).toFixed(4)}°/day`],
               ]
                 .filter(([, v]) => v)
                 .map(([label, value]) => (
