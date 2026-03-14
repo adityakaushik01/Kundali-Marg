@@ -79,7 +79,7 @@ const ZodiacSignSection = () => {
         <section className="relative z-10 py-20 px-6">
         <div className="text-center mb-16">
           <p className="text-lg font-light mb-4 opacity-80">IDENTIFY YOUR</p>
-          <h2 className="text-4xl font-light tracking-wider text-amber-400">Zodiac Sign</h2>
+          <h2 className="text-4xl font-light tracking-wider text-amber-400">Sun Sign (Western Astrology)</h2> 
         </div>
         
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -99,6 +99,10 @@ const ZodiacSignSection = () => {
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="text-center mt-16">
+          <p className="text-lg font-light mb-4 opacity-80">Note: <span className='font-medium text-amber-400'>Vedic astrology uses Moon sign (Rashi) calculated from your birth time and place.</span></p>
         </div>
       </section>
     );
