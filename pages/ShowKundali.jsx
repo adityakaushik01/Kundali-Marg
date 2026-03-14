@@ -174,18 +174,18 @@ const SIGN_POS = {
 };
 
 const PLANET_ZONE = {
-  1: { col0: 210, col1: 250, py: 119, step: 20 },
-  2: { col0: 103, col1: 143, py: 58, step: 20 },
-  3: { col0: 50, col1: 50, py: 98, step: 20 },
-  4: { col0: 170, col1: 210, py: 211, step: 20 },
-  5: { col0: 50, col1: 50, py: 319, step: 20 },
-  6: { col0: 103, col1: 103, py: 404, step: 20 },
-  7: { col0: 210, col1: 250, py: 334, step: 20 },
-  8: { col0: 328, col1: 368, py: 404, step: 20 },
-  9: { col0: 415, col1: 455, py: 353, step: 20 },
-  10: { col0: 335, col1: 365, py: 235, step: 20 },
-  11: { col0: 415, col1: 455, py: 98, step: 20 },
-  12: { col0: 339, col1: 379, py: 58, step: 20 },
+  1: { xMin: 195, xMax: 285, yMin: 85, yMax: 165 },
+  2: { xMin: 80, xMax: 160, yMin: 35, yMax: 110 },
+  3: { xMin: 20, xMax: 95, yMin: 90, yMax: 165 },
+  4: { xMin: 150, xMax: 230, yMin: 205, yMax: 275 },
+  5: { xMin: 20, xMax: 95, yMin: 305, yMax: 375 },
+  6: { xMin: 80, xMax: 160, yMin: 360, yMax: 440 },
+  7: { xMin: 195, xMax: 285, yMin: 310, yMax: 385 },
+  8: { xMin: 310, xMax: 390, yMin: 360, yMax: 440 },
+  9: { xMin: 385, xMax: 460, yMin: 305, yMax: 375 },
+  10:{ xMin: 285, xMax: 355, yMin: 205, yMax: 275 },
+  11:{ xMin: 385, xMax: 460, yMin: 90, yMax: 165 },
+  12:{ xMin: 310, xMax: 390, yMin: 35, yMax: 110 },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -253,73 +253,96 @@ const ShowKundali = () => {
 
   // ── VedicChart ─────────────────────────────────────────────────────────────
   const VedicChart = () => {
-    const renderPlanets = (h) => {
-      const data = getHouse(h);
-      const zone = PLANET_ZONE[h];
-      if (!data || !zone) return null;
+ const renderPlanets = (h) => {
+  const data = getHouse(h);
+  const zone = PLANET_ZONE[h];
+  if (!data || !zone) return null;
 
-      const items =
-        h === 1 ? [L.asc, ...(data.planets ?? [])] : [...(data.planets ?? [])];
-      if (items.length === 0) return null;
+  const items =
+    h === 1 ? [L.asc, ...(data.planets ?? [])] : [...(data.planets ?? [])];
 
-      const singleCol = zone.col0 === zone.col1;
+  if (!items.length) return null;
 
-      return items.map((planet, idx) => {
-        let x, y;
-        if (singleCol) {
-          // Stack all vertically in one column
-          x = zone.col0;
-          y = zone.py + idx * zone.step;
-        } else {
-          // 2-column: fill left first, then right
-          const half = Math.ceil(items.length / 2);
-          const isRight = idx >= half;
-          const row = isRight ? idx - half : idx;
-          x = isRight ? zone.col1 : zone.col0;
-          y = zone.py + row * zone.step;
-        }
+  const count = items.length;
 
-        const label =
-          planet === L.asc || planet === "Asc"
-            ? L.asc
-            : (L.abbr[planet] ?? planet.slice(0, 2));
+  // SAFE MARGIN (prevents touching chart lines)
+  const padding = 12;
 
-        return (
-          <text
-            key={`p-${h}-${idx}`}
-            x={x}
-            y={y}
-            fontSize="15"
-            fontWeight="600"
-            fontFamily="sans-serif"
-            fill="#fb923c"
-            dominantBaseline="middle"
-          >
-            {label}
-          </text>
-        );
-      });
-    };
+  const xMin = zone.xMin + padding;
+  const xMax = zone.xMax - padding;
+  const yMin = zone.yMin + padding;
+  const yMax = zone.yMax - padding;
+
+  const width = xMax - xMin;
+  const height = yMax - yMin;
+
+  let cols = 1;
+  if (count >= 3) cols = 2;
+  if (count >= 7) cols = 3;
+
+  const rows = Math.ceil(count / cols);
+
+  const colSpacing = width / cols;
+  const rowSpacing = height / rows;
+
+  // Font scaling like real astrology software
+  let fontSize = 15;
+  if (count >= 5) fontSize = 13;
+  if (count >= 7) fontSize = 11;
+
+  return items.map((planet, i) => {
+
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+
+    const x = xMin + colSpacing * col + colSpacing / 2;
+    const y = yMin + rowSpacing * row + rowSpacing / 2;
+
+    const label =
+      planet === L.asc || planet === "Asc"
+        ? L.asc
+        : (L.abbr[planet] ?? planet.slice(0, 2));
+
+    return (
+      <text
+        key={`p-${h}-${i}`}
+        x={x}
+        y={y}
+        fontSize={fontSize}
+        fontWeight="600"
+        fontFamily="sans-serif"
+        fill="#fb923c"
+        textAnchor="middle"
+        dominantBaseline="middle"
+      >
+        {label}
+      </text>
+    );
+  });
+};
 
     const renderSign = (h) => {
-      const data = getHouse(h);
-      if (!data) return null;
-      const pos = SIGN_POS[h];
-      return (
-        <text
-          key={`sign-${h}`}
-          x={pos.x}
-          y={pos.y}
-          fontSize="13"
-          fontFamily="sans-serif"
-          fill="rgba(253,230,138,0.7)"
-          dominantBaseline="middle"
-          textAnchor="middle"
-        >
-          {String(data.signIndex + 1).padStart(2, "0")}
-        </text>
-      );
-    };
+  const data = getHouse(h);
+  if (!data) return null;
+
+  const pos = SIGN_POS[h];
+
+  return (
+    <text
+      key={`sign-${h}`}
+      x={pos.x}
+      y={pos.y}
+      fontSize="12"
+      fontFamily="sans-serif"
+      fill="rgba(253,230,138,0.65)"
+      dominantBaseline="middle"
+      textAnchor="middle"
+      pointerEvents="none"
+    >
+      {String(data.signIndex + 1).padStart(2, "0")}
+    </text>
+  );
+};
 
     return (
       <div style={{ width: "100%", maxWidth: "500px", margin: "0 auto" }}>
