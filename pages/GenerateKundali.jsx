@@ -12,6 +12,8 @@ import dayjs from "dayjs";
 import { useNavigate } from 'react-router-dom';
 import ZodiacRing from "../components/ZodiacRing";
 import AmbientGlow from "../components/AmbientGlow";
+import Navbar from "../components/Navbar";
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
@@ -393,6 +395,7 @@ const GenerateKundali = () => {
       <BottomDecorativeElement />
       <ZodiacRing />
       <AmbientGlow />
+      <Navbar />
 
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="text-center mb-12">

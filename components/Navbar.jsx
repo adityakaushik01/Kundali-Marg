@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import LogoPng from '../src/assets//logo/logo.png';
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,23 +14,25 @@ const Navbar = () => {
       <div className="w-full max-w-3xl">
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-between gap-8 lg:gap-12">
-          <a href="#" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          <Link to="/" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
             HOME
-          </a>
-          <a href="#" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          </Link>
+          <Link to="" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
             ABOUT US
-          </a>
+          </Link>
           
+          <Link to="/" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
           <div className="mx-4 lg:mx-8">
             <img src={LogoPng} className="w-16 md:w-20" alt="Logo" />
           </div>
+          </Link>
           
-          <a href="#" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          <Link to="" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
             SERVICES
-          </a>
-          <a href="#" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          </Link>
+          <Link to="" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
             BLOG
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Navigation */}
