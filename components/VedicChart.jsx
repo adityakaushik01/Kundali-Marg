@@ -15,7 +15,6 @@ const ABBR = {
 const abbr = (p) => ABBR[p] || p.slice(0, 2);
 
 const VedicChart = ({ getPlanetsInHouse, getSignInHouse }) => {
-
   const housePositions = {
     1: { x: 270, y: 120 },
     2: { x: 400, y: 80 },
@@ -28,13 +27,12 @@ const VedicChart = ({ getPlanetsInHouse, getSignInHouse }) => {
     9: { x: 200, y: 350 },
     10: { x: 340, y: 350 },
     11: { x: 340, y: 200 },
-    12: { x: 200, y: 200 }
+    12: { x: 200, y: 200 },
   };
 
   return (
     <div className="flex justify-center">
       <svg width="540" height="540">
-
         {/* Outer diamond */}
         <polygon
           points="270,20 520,270 270,520 20,270"
@@ -51,13 +49,11 @@ const VedicChart = ({ getPlanetsInHouse, getSignInHouse }) => {
         <line x1="520" y1="20" x2="20" y2="520" stroke="#f59e0b" />
 
         {Object.entries(housePositions).map(([house, pos]) => {
-
           const planets = getPlanetsInHouse(Number(house));
           const sign = getSignInHouse(Number(house));
 
           return (
             <g key={house}>
-
               <text
                 x={pos.x}
                 y={pos.y}
@@ -77,7 +73,7 @@ const VedicChart = ({ getPlanetsInHouse, getSignInHouse }) => {
                   fill="white"
                   fontSize="10"
                 >
-                  {sign.slice(0,3)}
+                  {sign.slice(0, 3)}
                 </text>
               )}
 
@@ -85,7 +81,7 @@ const VedicChart = ({ getPlanetsInHouse, getSignInHouse }) => {
                 <text
                   key={i}
                   x={pos.x}
-                  y={pos.y + 32 + (i * 14)}
+                  y={pos.y + 32 + i * 14}
                   textAnchor="middle"
                   fill="#fb923c"
                   fontSize="11"
@@ -93,7 +89,6 @@ const VedicChart = ({ getPlanetsInHouse, getSignInHouse }) => {
                   {abbr(planet)}
                 </text>
               ))}
-
             </g>
           );
         })}

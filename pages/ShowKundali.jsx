@@ -183,9 +183,9 @@ const PLANET_ZONE = {
   7: { xMin: 195, xMax: 285, yMin: 310, yMax: 385 },
   8: { xMin: 310, xMax: 390, yMin: 360, yMax: 440 },
   9: { xMin: 385, xMax: 460, yMin: 305, yMax: 375 },
-  10:{ xMin: 285, xMax: 355, yMin: 205, yMax: 275 },
-  11:{ xMin: 385, xMax: 460, yMin: 90, yMax: 165 },
-  12:{ xMin: 310, xMax: 390, yMin: 35, yMax: 110 },
+  10: { xMin: 285, xMax: 355, yMin: 205, yMax: 275 },
+  11: { xMin: 385, xMax: 460, yMin: 90, yMax: 165 },
+  12: { xMin: 310, xMax: 390, yMin: 35, yMax: 110 },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -253,96 +253,95 @@ const ShowKundali = () => {
 
   // ── VedicChart ─────────────────────────────────────────────────────────────
   const VedicChart = () => {
- const renderPlanets = (h) => {
-  const data = getHouse(h);
-  const zone = PLANET_ZONE[h];
-  if (!data || !zone) return null;
+    const renderPlanets = (h) => {
+      const data = getHouse(h);
+      const zone = PLANET_ZONE[h];
+      if (!data || !zone) return null;
 
-  const items =
-    h === 1 ? [L.asc, ...(data.planets ?? [])] : [...(data.planets ?? [])];
+      const items =
+        h === 1 ? [L.asc, ...(data.planets ?? [])] : [...(data.planets ?? [])];
 
-  if (!items.length) return null;
+      if (!items.length) return null;
 
-  const count = items.length;
+      const count = items.length;
 
-  // SAFE MARGIN (prevents touching chart lines)
-  const padding = 12;
+      // SAFE MARGIN (prevents touching chart lines)
+      const padding = 12;
 
-  const xMin = zone.xMin + padding;
-  const xMax = zone.xMax - padding;
-  const yMin = zone.yMin + padding;
-  const yMax = zone.yMax - padding;
+      const xMin = zone.xMin + padding;
+      const xMax = zone.xMax - padding;
+      const yMin = zone.yMin + padding;
+      const yMax = zone.yMax - padding;
 
-  const width = xMax - xMin;
-  const height = yMax - yMin;
+      const width = xMax - xMin;
+      const height = yMax - yMin;
 
-  let cols = 1;
-  if (count >= 3) cols = 2;
-  if (count >= 7) cols = 3;
+      let cols = 1;
+      if (count >= 3) cols = 2;
+      if (count >= 7) cols = 3;
 
-  const rows = Math.ceil(count / cols);
+      const rows = Math.ceil(count / cols);
 
-  const colSpacing = width / cols;
-  const rowSpacing = height / rows;
+      const colSpacing = width / cols;
+      const rowSpacing = height / rows;
 
-  // Font scaling like real astrology software
-  let fontSize = 15;
-  if (count >= 5) fontSize = 13;
-  if (count >= 7) fontSize = 11;
+      // Font scaling like real astrology software
+      let fontSize = 15;
+      if (count >= 5) fontSize = 13;
+      if (count >= 7) fontSize = 11;
 
-  return items.map((planet, i) => {
+      return items.map((planet, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
 
-    const col = i % cols;
-    const row = Math.floor(i / cols);
+        const x = xMin + colSpacing * col + colSpacing / 2;
+        const y = yMin + rowSpacing * row + rowSpacing / 2;
 
-    const x = xMin + colSpacing * col + colSpacing / 2;
-    const y = yMin + rowSpacing * row + rowSpacing / 2;
+        const label =
+          planet === L.asc || planet === "Asc"
+            ? L.asc
+            : (L.abbr[planet] ?? planet.slice(0, 2));
 
-    const label =
-      planet === L.asc || planet === "Asc"
-        ? L.asc
-        : (L.abbr[planet] ?? planet.slice(0, 2));
-
-    return (
-      <text
-        key={`p-${h}-${i}`}
-        x={x}
-        y={y}
-        fontSize={fontSize}
-        fontWeight="600"
-        fontFamily="sans-serif"
-        fill="#fb923c"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {label}
-      </text>
-    );
-  });
-};
+        return (
+          <text
+            key={`p-${h}-${i}`}
+            x={x}
+            y={y}
+            fontSize={fontSize}
+            fontWeight="600"
+            fontFamily="sans-serif"
+            fill="#fb923c"
+            textAnchor="middle"
+            dominantBaseline="middle"
+          >
+            {label}
+          </text>
+        );
+      });
+    };
 
     const renderSign = (h) => {
-  const data = getHouse(h);
-  if (!data) return null;
+      const data = getHouse(h);
+      if (!data) return null;
 
-  const pos = SIGN_POS[h];
+      const pos = SIGN_POS[h];
 
-  return (
-    <text
-      key={`sign-${h}`}
-      x={pos.x}
-      y={pos.y}
-      fontSize="12"
-      fontFamily="sans-serif"
-      fill="rgba(253,230,138,0.65)"
-      dominantBaseline="middle"
-      textAnchor="middle"
-      pointerEvents="none"
-    >
-      {String(data.signIndex + 1).padStart(2, "0")}
-    </text>
-  );
-};
+      return (
+        <text
+          key={`sign-${h}`}
+          x={pos.x}
+          y={pos.y}
+          fontSize="12"
+          fontFamily="sans-serif"
+          fill="rgba(253,230,138,0.65)"
+          dominantBaseline="middle"
+          textAnchor="middle"
+          pointerEvents="none"
+        >
+          {String(data.signIndex + 1).padStart(2, "0")}
+        </text>
+      );
+    };
 
     return (
       <div style={{ width: "100%", maxWidth: "500px", margin: "0 auto" }}>
