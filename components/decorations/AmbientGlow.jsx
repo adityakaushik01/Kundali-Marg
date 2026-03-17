@@ -1,13 +1,3 @@
-/**
- * AmbientGlow
- *
- * Renders soft radial amber + violet glow blobs behind page content.
- *
- * Usage:
- *   import AmbientGlow from "../components/AmbientGlow";
- *   <AmbientGlow />
- */
-
 const AmbientGlow = () => (
   <div className="absolute inset-0 pointer-events-none overflow-hidden">
     {/* Top-left amber glow */}

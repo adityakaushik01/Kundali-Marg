@@ -1,15 +1,15 @@
-import AriesImage from '../src/assets/zodiac-signs/aries.png';
-import TaurusImage from '../src/assets/zodiac-signs/taurus.png';
-import GeminiImage from '../src/assets/zodiac-signs/gemini.png';
-import CancerImage from '../src/assets/zodiac-signs/cancer.png';
-import LeoImage from '../src/assets/zodiac-signs/leo.png';
-import VirgoImage from '../src/assets/zodiac-signs/virgo.png';
-import LibraImage from '../src/assets/zodiac-signs/libra.png';
-import ScorpioImage from '../src/assets/zodiac-signs/scorpio.png';
-import SagittariusImage from '../src/assets/zodiac-signs/sagittarius.png';
-import CapricornImage from '../src/assets/zodiac-signs/capricorn.png';
-import AquariusImage from '../src/assets/zodiac-signs/aquarius.png';
-import PiscesImage from '../src/assets/zodiac-signs/pisces.png';
+import AriesImage from '../../src/assets/zodiac-signs/aries.png';
+import TaurusImage from '../../src/assets/zodiac-signs/taurus.png';
+import GeminiImage from '../../src/assets/zodiac-signs/gemini.png';
+import CancerImage from '../../src/assets/zodiac-signs/cancer.png';
+import LeoImage from '../../src/assets/zodiac-signs/leo.png';
+import VirgoImage from '../../src/assets/zodiac-signs/virgo.png';
+import LibraImage from '../../src/assets/zodiac-signs/libra.png';
+import ScorpioImage from '../../src/assets/zodiac-signs/scorpio.png';
+import SagittariusImage from '../../src/assets/zodiac-signs/sagittarius.png';
+import CapricornImage from '../../src/assets/zodiac-signs/capricorn.png';
+import AquariusImage from '../../src/assets/zodiac-signs/aquarius.png';
+import PiscesImage from '../../src/assets/zodiac-signs/pisces.png';
 
 const ZodiacSignSection = () => {
 

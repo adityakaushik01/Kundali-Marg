@@ -1,19 +1,19 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Stars from "../components/Stars";
-import DecorativeElement from "../components/DecorativeElement";
-import BottomDecorativeElement from "../components/BottomDecorativeElement";
-import ZodiacRing from "../components/ZodiacRing";
-import AmbientGlow from "../components/AmbientGlow";
-import SunImage from "../src/assets/planets-icon/sun.png";
-import MoonImage from "../src/assets/planets-icon/moon.png";
-import MarsImage from "../src/assets/planets-icon/mars.png";
-import MercuryImage from "../src/assets/planets-icon/mercury.png";
-import JupiterImage from "../src/assets/planets-icon/jupiter.png";
-import VenusImage from "../src/assets/planets-icon/venus.png";
-import SaturnImage from "../src/assets/planets-icon/saturn.png";
-import RahuImage from "../src/assets/planets-icon/rahu.png";
-import KetuImage from "../src/assets/planets-icon/ketu.png";
+import Stars from "../../components/decorations/Stars";
+import DecorativeElement from "../../components/decorations/DecorativeElement";
+import BottomDecorativeElement from "../../components/decorations/BottomDecorativeElement";
+import ZodiacRing from "../../components/decorations/ZodiacRing";
+import AmbientGlow from "../../components/decorations/AmbientGlow";
+import SunImage from "../../src/assets/planets-icon/sun.png";
+import MoonImage from "../../src/assets/planets-icon/moon.png";
+import MarsImage from "../../src/assets/planets-icon/mars.png";
+import MercuryImage from "../../src/assets/planets-icon/mercury.png";
+import JupiterImage from "../../src/assets/planets-icon/jupiter.png";
+import VenusImage from "../../src/assets/planets-icon/venus.png";
+import SaturnImage from "../../src/assets/planets-icon/saturn.png";
+import RahuImage from "../../src/assets/planets-icon/rahu.png";
+import KetuImage from "../../src/assets/planets-icon/ketu.png";
 // ── Language data ──────────────────────────────────────────────────────────────
 const LANG = {
   en: {

@@ -4,15 +4,15 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
-import Stars from "../components/Stars";
-import DecorativeElement from "../components/DecorativeElement";
-import BottomDecorativeElement from "../components/BottomDecorativeElement";
+import Stars from "../../components/decorations/Stars";
+import DecorativeElement from "../../components/decorations/DecorativeElement";
+import BottomDecorativeElement from "../../components/decorations/BottomDecorativeElement";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
 import { useNavigate } from 'react-router-dom';
-import ZodiacRing from "../components/ZodiacRing";
-import AmbientGlow from "../components/AmbientGlow";
-import Navbar from "../components/Navbar";
+import ZodiacRing from "../../components/decorations/ZodiacRing";
+import AmbientGlow from "../../components/decorations/AmbientGlow";
+import Navbar from "../../components/layout/Navbar";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -344,10 +344,12 @@ const GenerateKundali = () => {
       console.log("Sending kundali request:", kundaliDataInput);
 
       // Call your local backend API
+      const token = localStorage.getItem("token");
       const response = await fetch(`${BACKEND_URL}/api/kundli`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(kundaliDataInput),
       });
@@ -389,7 +391,7 @@ const GenerateKundali = () => {
   const [openTime, setOpenTime] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-900 text-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-800 to-teal-900 text-white overflow-x-hidden">
       <Stars />
       <DecorativeElement />
       <BottomDecorativeElement />
@@ -397,7 +399,7 @@ const GenerateKundali = () => {
       <AmbientGlow />
       <Navbar />
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="container mx-auto px-4 md:py-10 relative z-10">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 bg-clip-text text-transparent mb-4">
             Generate Your Janam Kundali
@@ -410,10 +412,10 @@ const GenerateKundali = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="relative z-20 max-w-2xl mx-auto p-10 rounded-2xl shadow-2xl backdrop-blur-md border border-white/20 bg-white/5"
+          className="relative z-20 max-w-2xl mx-auto p-10 rounded-2xl shadow-2xl backdrop-blur-xl border border-white/20 bg-white/10"
         >
           {error && (
-            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl">
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl backdrop-blur-md">
               <p className="text-red-200 text-center">{error}</p>
             </div>
           )}
@@ -503,8 +505,10 @@ const GenerateKundali = () => {
           </ThemeProvider>
 
           <div className="mb-8">
-            <label className="block text-lg font-medium mb-3 text-amber-300">
+            <label className="inline-flex text-lg font-medium mb-3 text-amber-300">
               Place of Birth *
+            </label><label className="inline-flex text-sm ml-3 mb-3 text-gray-300">
+               (Select a valid location from the suggestions)
             </label>
             <div className="relative">
               <input
@@ -516,7 +520,7 @@ const GenerateKundali = () => {
                 required
               />
               {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl max-h-64 overflow-y-auto z-[999] border border-amber-400/30">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl max-h-64 overflow-y-auto z-[999] border border-amber-400/30">
                   {suggestions.map((item, index) => (
                     <div
                       key={index}

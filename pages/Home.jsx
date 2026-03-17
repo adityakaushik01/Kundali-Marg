@@ -1,11 +1,11 @@
-import Navbar from "../components/Navbar";
-import ZodiacSignSection from "../components/ZodiacSignSection";
-import Stars from "../components/Stars";
-import DecorativeElement from "../components/DecorativeElement";
-import BottomDecorativeElement from "../components/BottomDecorativeElement";
+import Navbar from "../components/layout/Navbar";
+import ZodiacSignSection from "../components/layout/ZodiacSignSection";
+import Stars from "../components/decorations/Stars";
+import DecorativeElement from "../components/decorations/DecorativeElement";
+import BottomDecorativeElement from "../components/decorations/BottomDecorativeElement";
 import { Link } from "react-router-dom";
-import ZodiacRing from "../components/ZodiacRing";
-import AmbientGlow from "../components/AmbientGlow";
+import ZodiacRing from "../components/decorations/ZodiacRing";
+import AmbientGlow from "../components/decorations/AmbientGlow";
 
 const Home = () => {
   return (
