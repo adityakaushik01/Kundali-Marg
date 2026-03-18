@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
   const [formData, setFormData] = useState({
     email_address: "",
     password: ""
@@ -29,49 +31,66 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.email_address || !formData.password) {
-  toast.error("Please fill all fields");
-  return;
-}
-
-  setLoading(true);
-
-  try {
-
-    const res = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      toast.error(data.message || "Login failed");
-      setLoading(false);
+    if (!formData.email_address || !formData.password) {
+      toast.error("Please fill all fields");
       return;
     }
 
-    // Save token
-    localStorage.setItem("token", data.token);
+    setLoading(true);
 
-    toast.success("Login successful");
+    try {
 
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
+      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email_address: formData.email_address.trim(), // ✅ FIX
+          password: formData.password
+        })
+      });
 
-  } catch (error) {
+      const data = await res.json();
 
-    toast.error("Server error");
-    setLoading(false);
+      if (!res.ok) {
 
-  }
-};
+        if (data.message?.includes("not verified")) {
+
+          toast.error("Please verify your email. OTP sent again.");
+
+          navigate("/verify-email", {
+            state: { email: data.email_address || formData.email_address }
+          });
+
+        } else {
+          toast.error(data.message || "Login failed");
+        }
+
+        setLoading(false);
+        return;
+      }
+
+      // Save token
+      localStorage.setItem("token", data.token);
+
+      toast.success("Login successful");
+
+      setLoading(false);
+
+      setTimeout(() => {
+        navigate("/user-dashboard");
+      }, 1000);
+
+    } catch (error) {
+
+      toast.error("Server error");
+      setLoading(false);
+
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-800 to-teal-900 text-white relative overflow-hidden">
@@ -140,7 +159,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="cursor-pointer w-full py-3 bg-amber-600 hover:bg-amber-700 rounded-full tracking-wider transition-colors"
+              className="cursor-pointer w-full py-3 bg-amber-600 hover:bg-amber-700 rounded-full tracking-wider transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? "Logging in..." : "LOGIN"}
             </button>
@@ -155,20 +174,19 @@ const Login = () => {
           </div>
 
           {/* Google Login */}
-        <button
-//   onClick={() => googleLogin()}
-  className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all"
->
-  <FcGoogle size={22} />
-  Continue with Google
-</button>
+          <button
+            className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all cursor-pointer" // ✅ FIX
+          >
+            <FcGoogle size={22} />
+            Continue with Google
+          </button>
 
           {/* Signup */}
           <p className="text-center text-sm mt-6 opacity-80">
             Don’t have an account?{" "}
             <Link
               to="/signup"
-              className="text-amber-400 hover:text-amber-300"
+              className="ml-2 text-sm font-medium tracking-wider border border-amber-500 text-amber-400 px-3 py-1 rounded-full transition-all duration-300 hover:bg-amber-600 hover:text-white hover:border-amber-600"
             >
               Sign up
             </Link>

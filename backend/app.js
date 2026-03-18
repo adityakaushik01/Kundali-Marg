@@ -1,6 +1,6 @@
 import express from "express";
 import corsMiddleware from "./middleware/corsConfig.js";
-import kundliLimiter from "./middleware/rateLimiter.js";
+import rateLimiter from "./middleware/rateLimiter.js";
 import requestLogger from "./middleware/requestLogger.js";
 import notFound from "./middleware/notFound.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -20,13 +20,12 @@ app.use(express.urlencoded({ extended: true }));
 // ── Request Logger ──────────────────────────
 app.use(requestLogger);
 
-// ── Authentication Middleware ───────────────
+// ── Rate Limiters (BEFORE ROUTES) ───────────
+app.use("/api/auth", rateLimiter);
+app.use("/api/kundli", rateLimiter);
+
+// ── Routes ─────────────────────────────────
 app.use("/api/auth", authRoutes);
-
-// ── Rate limiter applied before route ───────
-app.use("/api/kundli", kundliLimiter);
-
-// ── Kundli Routes ───────────────────────────
 app.use("/api", kundliRoutes);
 
 // ── 404 Handler ─────────────────────────────

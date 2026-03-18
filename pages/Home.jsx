@@ -32,7 +32,7 @@ const Home = () => {
         </p>
 
         <Link
-          to="/GenerateKundali"
+          to="/generate-kundali"
           className="font-medium bg-amber-600 hover:bg-amber-700 text-white px-12 py-4 rounded-full tracking-wider transition-colors"
         >
           GET BIRTH CHART

@@ -20,15 +20,15 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-between gap-6 lg:gap-10">
 
-          <Link to="/" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          <Link to="/" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors duration-300">
             HOME
           </Link>
 
-          <Link to="/about" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          <Link to="/about" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors duration-300">
             ABOUT US
           </Link>
 
-          <Link to="/services" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          <Link to="/services" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors duration-300">
             SERVICES
           </Link>
 
@@ -37,7 +37,7 @@ const Navbar = () => {
             <img src={LogoPng} className="w-16 md:w-20 mx-2" alt="Logo" />
           </Link>
 
-          <Link to="/blog" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors">
+          <Link to="/blog" className="text-sm font-medium tracking-wider hover:text-amber-400 transition-colors duration-300">
             BLOG
           </Link>
 
@@ -51,7 +51,7 @@ const Navbar = () => {
           {/* Signup Button */}
          <Link
   to="/signup"
-  className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-full text-sm tracking-wider transition-colors"
+  className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-full text-sm tracking-wider transition-colors duration-300"
 >
   SIGN UP
 </Link>
@@ -92,7 +92,7 @@ const Navbar = () => {
 
               <Link
                 to="/"
-                className="text-sm tracking-wider text-center hover:text-amber-400"
+                className="text-sm tracking-wider text-center hover:text-amber-400 duration-300"
                 onClick={closeMenu}
               >
                 HOME
@@ -100,7 +100,7 @@ const Navbar = () => {
 
               <Link
                 to="/about"
-                className="text-sm tracking-wider text-center hover:text-amber-400"
+                className="text-sm tracking-wider text-center hover:text-amber-400 duration-300"
                 onClick={closeMenu}
               >
                 ABOUT US
@@ -108,7 +108,7 @@ const Navbar = () => {
 
               <Link
                 to="/services"
-                className="text-sm tracking-wider text-center hover:text-amber-400"
+                className="text-sm tracking-wider text-center hover:text-amber-400 duration-300"
                 onClick={closeMenu}
               >
                 SERVICES
@@ -116,7 +116,7 @@ const Navbar = () => {
 
               <Link
                 to="/blog"
-                className="text-sm tracking-wider text-center hover:text-amber-400"
+                className="text-sm tracking-wider text-center hover:text-amber-400 duration-300"
                 onClick={closeMenu}
               >
                 BLOG
@@ -133,7 +133,7 @@ const Navbar = () => {
               {/* Signup Button */}
               <Link
                 to="/signup"
-                className="bg-amber-600 hover:bg-amber-700 rounded-full py-2 text-center text-sm tracking-wider"
+                className="bg-amber-600 hover:bg-amber-700 rounded-full py-2 text-center text-sm tracking-wider duration-300"
                 onClick={closeMenu}
               >
                 SIGN UP

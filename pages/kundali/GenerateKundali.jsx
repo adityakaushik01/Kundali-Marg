@@ -363,8 +363,8 @@ const GenerateKundali = () => {
       console.log("Kundali data received:", data);
       
       if (data.status === 'success' && data.data) {
-        // Navigate to ShowKundali page with the data
-        navigate('/ShowKundali', { 
+        // Navigate to show-kundali page with the data
+        navigate('/show-kundali', { 
           state: { 
             kundaliData: data,
             name: formData.name.trim(),

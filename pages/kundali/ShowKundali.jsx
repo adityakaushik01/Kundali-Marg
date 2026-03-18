@@ -225,7 +225,7 @@ const ShowKundali = () => {
             Please generate your Kundali first.
           </p>
           <button
-            onClick={() => navigate("/GenerateKundali")}
+            onClick={() => navigate("/generate-kundali")}
             className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-black font-bold rounded-xl"
           >
             Generate Kundali
@@ -804,7 +804,7 @@ const ShowKundali = () => {
           {/* Controls row */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <button
-              onClick={() => navigate("/GenerateKundali")}
+              onClick={() => navigate("/generate-kundali")}
               className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105"
               style={{
                 background: "rgba(245,158,11,0.1)",

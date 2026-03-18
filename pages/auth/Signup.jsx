@@ -4,14 +4,19 @@ import DecorativeElement from "../../components/decorations/DecorativeElement";
 import BottomDecorativeElement from "../../components/decorations/BottomDecorativeElement";
 import ZodiacRing from "../../components/decorations/ZodiacRing";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -29,30 +34,47 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.first_name || !formData.last_name || !formData.email_address || !formData.password) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signup", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          email_address: formData.email_address.trim()
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Signup successful!");
+        toast.success("Signup successful! Please verify email.");
 
         setTimeout(() => {
-          navigate("/login");
+          navigate("/verify-email", {
+            state: { email: formData.email_address },
+          });
         }, 1000);
       } else {
         toast.error(data.message || "Signup failed");
       }
+
       console.log("Signup Response:", data);
+
+      setLoading(false);
+
     } catch (error) {
-      
       console.error(error);
+      toast.error("Server error");
+      setLoading(false);
     }
   };
 
@@ -72,10 +94,9 @@ const Signup = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* First Name */}
+
             <div>
               <label className="text-sm opacity-80">First Name</label>
-
               <input
                 type="text"
                 name="first_name"
@@ -87,10 +108,8 @@ const Signup = () => {
               />
             </div>
 
-            {/* Last Name */}
             <div>
               <label className="text-sm opacity-80">Last Name</label>
-
               <input
                 type="text"
                 name="last_name"
@@ -102,10 +121,8 @@ const Signup = () => {
               />
             </div>
 
-            {/* Email */}
             <div>
               <label className="text-sm opacity-80">Email Address</label>
-
               <input
                 type="email"
                 name="email_address"
@@ -117,10 +134,8 @@ const Signup = () => {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="text-sm opacity-80">Password</label>
-
               <input
                 type="password"
                 name="password"
@@ -132,34 +147,32 @@ const Signup = () => {
               />
             </div>
 
-            {/* Signup Button */}
             <button
               type="submit"
-              className="w-full mt-4 bg-amber-600 hover:bg-amber-700 py-3 rounded-full tracking-wider transition-colors"
+              disabled={loading}
+              className="w-full mt-4 bg-amber-600 hover:bg-amber-700 py-3 rounded-full tracking-wider transition-colors cursor-pointer duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              SIGN UP
+              {loading ? "Signing up..." : "SIGN UP"}
             </button>
+
           </form>
 
-          {/* Divider */}
           <div className="flex items-center my-6">
             <div className="flex-grow h-px bg-white/20"></div>
             <span className="px-4 text-sm opacity-60">OR</span>
             <div className="flex-grow h-px bg-white/20"></div>
           </div>
 
-          {/* Google Signup */}
-          <button className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all">
+          <button className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 cursor-pointer">
             <FcGoogle size={22} />
             Continue with Google
           </button>
 
-          {/* Login Link */}
           <p className="text-sm text-center mt-6 opacity-70">
             Already have an account?
             <Link
               to="/login"
-              className="ml-2 text-amber-400 hover:text-amber-500"
+              className="ml-2 text-sm font-medium tracking-wider border border-amber-500 text-amber-400 px-3 py-1 rounded-full transition-all duration-300 hover:bg-amber-600 hover:text-white hover:border-amber-600"
             >
               Login
             </Link>
