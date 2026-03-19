@@ -74,6 +74,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  last_otp_sent: Date
 }, {
   collection: "user"
 });

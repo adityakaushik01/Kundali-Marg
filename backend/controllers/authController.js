@@ -1,10 +1,10 @@
-import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import User from "../models/User.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { logger } from "../utils/logger.js";
+import { sendOTP } from "../services/otpService.js";
 
 // Signup
 export const signup = async (req, res) => {
@@ -15,22 +15,13 @@ export const signup = async (req, res) => {
 
     const existingUser = await User.findOne({ email_address });
 
-    // ✅ HANDLE EXISTING USER
     if (existingUser) {
       if (!existingUser.email_verified) {
-        // resend OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-        existingUser.email_otp = otp;
-        existingUser.email_otp_expiry = Date.now() + 10 * 60 * 1000;
-
-        await existingUser.save();
-
-        await sendEmail(
-          email_address,
-          "Verify your email - Kundali Marg",
-          `<h2>Your OTP is: ${otp}</h2><p>Valid for 10 minutes</p>`
-        );
+        try {
+          await sendOTP(existingUser);
+        } catch (error) {
+          return res.status(400).json({ message: error.message });
+        }
 
         logger.info("OTP resent", { email_address });
 
@@ -45,18 +36,16 @@ export const signup = async (req, res) => {
         message: "Email already registered"
       });
     }
+
     console.log("user enter password", password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
+    // Save user first
     const user = await User.create({
       first_name,
       last_name,
       email_address,
-      password: hashedPassword,
-      email_otp: otp,
-      email_otp_expiry: Date.now() + 10 * 60 * 1000
+      password: hashedPassword
     });
 
     logger.info("User created", {
@@ -64,11 +53,12 @@ export const signup = async (req, res) => {
       email_address
     });
 
-    await sendEmail(
-      email_address,
-      "Verify your email - Kundali Marg",
-      `<h2>Your OTP is: ${otp}</h2><p>Valid for 10 minutes</p>`
-    );
+    // Send OTP after — if fails, user stays in DB (unverified, handled on next signup attempt)
+    try {
+      await sendOTP(user);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
 
     logger.info("OTP sent", { email_address });
 
@@ -100,35 +90,26 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    if (!user.email_verified) {
-
-  // 🔥 resend OTP automatically
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-  user.email_otp = otp;
-  user.email_otp_expiry = Date.now() + 10 * 60 * 1000;
-
-  await user.save();
-
-  await sendEmail(
-    user.email_address,
-    "Verify your email - Kundali Marg",
-    `<h2>Your OTP is: ${otp}</h2>`
-  );
-
-  logger.info("OTP resent on login", { email_address });
-
-  return res.status(400).json({
-    message: "Email not verified. OTP sent again.",
-    email_address: user.email_address
-  });
-}
-
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
       logger.warn("Login failed - wrong password", { email_address });
       return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    if (!user.email_verified) {
+      try {
+        await sendOTP(user);
+      } catch (error) {
+        return res.status(400).json({ message: error.message });
+      }
+
+      logger.info("OTP resent on login", { email_address });
+
+      return res.status(400).json({
+        message: "Email not verified. OTP sent again.",
+        email_address: user.email_address
+      });
     }
 
     const token = jwt.sign(
@@ -171,10 +152,10 @@ export const createUserByAdmin = async (req, res) => {
     }
 
     const tempPassword = crypto.randomBytes(8).toString("hex");
-
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
     const user = await User.create({
       first_name,
@@ -182,7 +163,7 @@ export const createUserByAdmin = async (req, res) => {
       email_address,
       password: hashedPassword,
       user_role,
-      reset_token: resetToken,
+      reset_token: hashedToken,
       reset_token_expiry: Date.now() + 3600000,
     });
 
@@ -196,14 +177,14 @@ export const createUserByAdmin = async (req, res) => {
       <p>Your account has been created by admin.</p>
       <p>Please click below to set your password:</p>
       <a href="${resetLink}">Reset Password</a>
-      `,
+      `
     );
 
     res.json({
       message: "User created and email sent",
     });
   } catch (error) {
-    console.error(error);
+    logger.error("Admin create user error", { error: error.message });
 
     res.status(500).json({
       message: "User creation failed",
@@ -217,8 +198,10 @@ export const resetPassword = async (req, res) => {
   try {
     const { password } = req.body;
 
+    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
+
     const user = await User.findOne({
-      reset_token: req.params.token,
+      reset_token: hashedToken,
       reset_token_expiry: { $gt: Date.now() },
     });
 
@@ -238,6 +221,8 @@ export const resetPassword = async (req, res) => {
       message: "Password updated successfully",
     });
   } catch (error) {
+    logger.error("Reset password error", { error: error.message });
+
     res.status(500).json({
       message: "Reset failed",
     });
@@ -245,7 +230,7 @@ export const resetPassword = async (req, res) => {
 };
 
 
-// Verify Email Otp
+// Verify Email OTP
 export const verifyEmailOtp = async (req, res) => {
   try {
     const { email_address, otp } = req.body;
@@ -259,28 +244,18 @@ export const verifyEmailOtp = async (req, res) => {
     }
 
     if (user.email_verified) {
-      // ✅ Already verified → still login
-      const token = jwt.sign(
-        { user_id: user._id, user_role: user.user_role },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
-      );
-
-      return res.json({
-        message: "Already verified",
-        token
-      });
-    }
-
-    if (user.email_otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
+      return res.status(400).json({ message: "Email already verified. Please login." });
     }
 
     if (user.email_otp_expiry < Date.now()) {
       return res.status(400).json({ message: "OTP expired" });
     }
 
-    // ✅ Mark verified
+    // Plain text compare since OTP is stored as plain text
+    if (user.email_otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
     user.email_verified = true;
     user.email_otp = null;
     user.email_otp_expiry = null;
@@ -289,7 +264,6 @@ export const verifyEmailOtp = async (req, res) => {
 
     logger.info("Email verified", { email_address });
 
-    // ✅ AUTO LOGIN TOKEN
     const token = jwt.sign(
       { user_id: user._id, user_role: user.user_role },
       process.env.JWT_SECRET,
