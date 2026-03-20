@@ -8,7 +8,8 @@ import ZodiacRing from "../../components/decorations/ZodiacRing";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
 
@@ -22,6 +23,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+const [searchParams] = useSearchParams();
+const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -48,7 +51,7 @@ const Login = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          email_address: formData.email_address.trim(), // ✅ FIX
+          email_address: formData.email_address.trim(), // FIX
           password: formData.password
         })
       });
@@ -73,16 +76,23 @@ const Login = () => {
         return;
       }
 
-      // Save token
-      localStorage.setItem("token", data.token);
+     login(data.token); // saves token + sets auth state
 
-      toast.success("Login successful");
+toast.success("Login successful");
 
-      setLoading(false);
+setLoading(false);
 
-      setTimeout(() => {
-        navigate("/user-dashboard");
-      }, 1000);
+const redirectTo = searchParams.get("redirect");
+const roleDashboard = {
+  USER:        "/user-dashboard",
+  ASTROLOGER:  "/astrologer-dashboard",
+  SUPER_ADMIN: "/admin-dashboard",
+};
+const destination = redirectTo || roleDashboard[data.user?.user_role] || "/";
+
+setTimeout(() => {
+  navigate(destination, { replace: true });
+}, 1000);
 
     } catch (error) {
 
@@ -175,7 +185,7 @@ const Login = () => {
 
           {/* Google Login */}
           <button
-            className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all cursor-pointer" // ✅ FIX
+            className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all cursor-pointer" // FIX
           >
             <FcGoogle size={22} />
             Continue with Google

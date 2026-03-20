@@ -124,9 +124,16 @@ export const login = async (req, res) => {
     });
 
     res.json({
-      message: "Login successful",
-      token
-    });
+  message: "Login successful",
+  token,
+  user: {
+    user_id:    user._id,
+    user_role:  user.user_role,
+    first_name: user.first_name,
+    last_name:  user.last_name,
+    email:      user.email_address,
+  }
+});
 
   } catch (error) {
     logger.error("Login error", { error: error.message });
@@ -271,9 +278,16 @@ export const verifyEmailOtp = async (req, res) => {
     );
 
     res.json({
-      message: "Email verified successfully",
-      token
-    });
+  message: "Email verified successfully",
+  token,
+  user: {
+    user_id:    user._id,
+    user_role:  user.user_role,
+    first_name: user.first_name,
+    last_name:  user.last_name,
+    email:      user.email_address,
+  }
+});
 
   } catch (error) {
     logger.error("OTP verification error", { error: error.message });

@@ -8,7 +8,7 @@ import {
   verifyEmailOtp
 } from "../controllers/authController.js";
 
-// ✅ NEW IMPORT
+// NEW IMPORT
 import { sendEmailController } from "../controllers/sendEmailController.js";
 
 const router = express.Router();
@@ -19,7 +19,7 @@ router.post("/verify-email", verifyEmailOtp);
 router.post("/admin/create-user", createUserByAdmin);
 router.post("/reset-password/:token", resetPassword);
 
-// ✅ EMAIL TEST ROUTE
+// EMAIL TEST ROUTE
 router.post("/send-email", sendEmailController);
 
 export default router;
