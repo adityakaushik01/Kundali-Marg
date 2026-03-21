@@ -177,19 +177,19 @@ setTimeout(() => {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-6">
+          {/* <div className="flex items-center my-6">
             <div className="flex-grow h-px bg-white/20"></div>
             <span className="px-4 text-sm opacity-60">OR</span>
             <div className="flex-grow h-px bg-white/20"></div>
-          </div>
+          </div> */}
 
           {/* Google Login */}
-          <button
+          {/* <button
             className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all cursor-pointer" // FIX
           >
             <FcGoogle size={22} />
             Continue with Google
-          </button>
+          </button> */}
 
           {/* Signup */}
           <p className="text-center text-sm mt-6 opacity-80">

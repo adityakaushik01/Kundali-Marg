@@ -166,16 +166,16 @@ const Signup = () => {
             </button>
           </form>
 
-          <div className="flex items-center my-6">
+          {/* <div className="flex items-center my-6">
             <div className="flex-grow h-px bg-white/20"></div>
             <span className="px-4 text-sm opacity-60">OR</span>
             <div className="flex-grow h-px bg-white/20"></div>
-          </div>
+          </div> */}
 
-          <button className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 cursor-pointer">
+          {/* <button className="flex items-center justify-center gap-3 w-full py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 cursor-pointer">
             <FcGoogle size={22} />
             Continue with Google
-          </button>
+          </button> */}
 
           <p className="text-sm text-center mt-6 opacity-70">
             Already have an account?
