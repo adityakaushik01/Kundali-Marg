@@ -33,14 +33,13 @@ export const signup = async (req, res) => {
       logger.warn("Signup failed - email exists", { email_address });
 
       return res.status(400).json({
-        message: "Email already registered"
+        message: "Email already registered. Please login."
       });
     }
 
     console.log("user enter password", password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save user first
     const user = await User.create({
       first_name,
       last_name,
@@ -53,7 +52,6 @@ export const signup = async (req, res) => {
       email_address
     });
 
-    // Send OTP after — if fails, user stays in DB (unverified, handled on next signup attempt)
     try {
       await sendOTP(user);
     } catch (error) {
@@ -113,7 +111,13 @@ export const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { user_id: user._id, user_role: user.user_role },
+      {
+        user_id:    user._id,
+        user_role:  user.user_role,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        email:      user.email_address,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -124,16 +128,16 @@ export const login = async (req, res) => {
     });
 
     res.json({
-  message: "Login successful",
-  token,
-  user: {
-    user_id:    user._id,
-    user_role:  user.user_role,
-    first_name: user.first_name,
-    last_name:  user.last_name,
-    email:      user.email_address,
-  }
-});
+      message: "Login successful",
+      token,
+      user: {
+        user_id:    user._id,
+        user_role:  user.user_role,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        email:      user.email_address,
+      }
+    });
 
   } catch (error) {
     logger.error("Login error", { error: error.message });
@@ -258,7 +262,6 @@ export const verifyEmailOtp = async (req, res) => {
       return res.status(400).json({ message: "OTP expired" });
     }
 
-    // Plain text compare since OTP is stored as plain text
     if (user.email_otp !== otp) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
@@ -272,22 +275,28 @@ export const verifyEmailOtp = async (req, res) => {
     logger.info("Email verified", { email_address });
 
     const token = jwt.sign(
-      { user_id: user._id, user_role: user.user_role },
+      {
+        user_id:    user._id,
+        user_role:  user.user_role,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        email:      user.email_address,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
     res.json({
-  message: "Email verified successfully",
-  token,
-  user: {
-    user_id:    user._id,
-    user_role:  user.user_role,
-    first_name: user.first_name,
-    last_name:  user.last_name,
-    email:      user.email_address,
-  }
-});
+      message: "Email verified successfully",
+      token,
+      user: {
+        user_id:    user._id,
+        user_role:  user.user_role,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        email:      user.email_address,
+      }
+    });
 
   } catch (error) {
     logger.error("OTP verification error", { error: error.message });

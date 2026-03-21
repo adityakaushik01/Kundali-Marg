@@ -11,7 +11,6 @@ import VerifyEmail from "../pages/auth/VerifyEmail";
 import Unauthorized from "../pages/auth/Unauthorized";
 import { AuthProvider } from "../hooks/useAuth";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
-import NewUserDashboard from "../pages/user/UserDashboard";
 
 function App() {
   return (
@@ -28,7 +27,6 @@ function App() {
         <Route element={<ProtectedRoute role="USER" />}>
           <Route path="/user-dashboard" element={<UserDashboard />} />
         </Route>
-        <Route path="/new-dashboard" element={<NewUserDashboard />} />
       </Routes>
     </AuthProvider>
   );

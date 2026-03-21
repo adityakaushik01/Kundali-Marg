@@ -10,7 +10,6 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 
 const Signup = () => {
-
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [loading, setLoading] = useState(false);
@@ -34,7 +33,12 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.first_name || !formData.last_name || !formData.email_address || !formData.password) {
+    if (
+      !formData.first_name ||
+      !formData.last_name ||
+      !formData.email_address ||
+      !formData.password
+    ) {
       toast.error("Please fill all fields");
       return;
     }
@@ -49,10 +53,9 @@ const Signup = () => {
         },
         body: JSON.stringify({
           ...formData,
-          email_address: formData.email_address.trim()
+          email_address: formData.email_address.trim(),
         }),
       });
-
       const data = await res.json();
 
       if (res.ok) {
@@ -64,13 +67,21 @@ const Signup = () => {
           });
         }, 1000);
       } else {
-        toast.error(data.message || "Signup failed");
+        if (res.status === 400) {
+          toast.error(data.message || "Signup failed");
+          setTimeout(() => {
+            navigate("/login", {
+              state: { email: formData.email_address },
+            });
+          }, 1000);
+        } else {
+          toast.error(data.message || "Signup failed");
+        }
       }
 
       console.log("Signup Response:", data);
 
       setLoading(false);
-
     } catch (error) {
       console.error(error);
       toast.error("Server error");
@@ -94,7 +105,6 @@ const Signup = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
             <div>
               <label className="text-sm opacity-80">First Name</label>
               <input
@@ -154,7 +164,6 @@ const Signup = () => {
             >
               {loading ? "Signing up..." : "SIGN UP"}
             </button>
-
           </form>
 
           <div className="flex items-center my-6">

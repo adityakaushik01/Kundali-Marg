@@ -6,7 +6,8 @@ import notFound from "./middleware/notFound.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 import authRoutes from "./routes/auth.js";
-import kundliRoutes from "./routes/kundliRoutes.js";
+import kundaliRoutes from "./routes/kundaliRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
@@ -26,7 +27,9 @@ app.use("/api/kundli", rateLimiter);
 
 // ── Routes ─────────────────────────────────
 app.use("/api/auth", authRoutes);
-app.use("/api", kundliRoutes);
+app.use("/api", kundaliRoutes);
+app.use("/api/kundali", kundaliRoutes);
+app.use("/api/user", userRoutes);
 
 // ── 404 Handler ─────────────────────────────
 app.use(notFound);

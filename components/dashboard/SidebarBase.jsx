@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import logoImage from "../../src/assets/logo/logo.png";
+import { LuLogOut } from "react-icons/lu";
 
 const SidebarBase = ({
   navItems    = [],
@@ -39,7 +41,7 @@ const SidebarBase = ({
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all group-hover:scale-105"
             style={{ background:accent.bg, border:`1px solid ${accent.border}`, boxShadow:`0 0 16px ${accent.glow}` }}
           >
-            <span style={{ fontSize:"13px" }}>✦</span>
+            <img src={logoImage} className="w-5" alt="Logo" />
           </div>
           <div className="leading-tight">
             <p className="text-white text-xs font-light tracking-[0.22em] uppercase">{logo.top}</p>
@@ -129,7 +131,7 @@ const SidebarBase = ({
 
       {/* ── User card ── */}
       <div className="px-4 pb-6 flex-shrink-0">
-        <div className="p-3.5 rounded-xl flex items-center gap-3"
+        <div className="py-3.5 px-2 rounded-xl flex items-center gap-3"
           style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)" }}>
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-light"
@@ -147,11 +149,9 @@ const SidebarBase = ({
           </div>
           {onLogout && (
             <button onClick={onLogout} title="Logout"
-              className="flex-shrink-0 transition-colors hover:text-rose-400"
-              style={{ color:"rgba(255,255,255,0.18)" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-              </svg>
+              className="p-2 rounded-xl hover:bg-rose-400 hover:border-rose-400 cursor-pointer flex-shrink-0 text-white transition-all duration-300"
+              style={{ opacity:0.5 }}>
+              <LuLogOut/>
             </button>
           )}
         </div>

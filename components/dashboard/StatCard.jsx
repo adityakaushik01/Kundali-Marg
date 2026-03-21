@@ -1,4 +1,3 @@
-// components/dashboard/StatCard.jsx
 // Reusable stat card. Use in User, Admin, Astrologer dashboards.
 //
 // Props:
@@ -30,7 +29,7 @@ const StatCard = ({ label, value, sub, color = "amber", icon, onClick }) => {
         {/* Icon + value row */}
         <div className="flex items-start justify-between mb-2">
           {icon && (
-            <span className="text-xl leading-none">{icon}</span>
+            <span className="text-xl leading-none" style={{ color: c.text }}>{icon}</span>
           )}
           <p className="text-3xl font-light leading-none" style={{ color: c.text }}>
             {value}
@@ -44,7 +43,7 @@ const StatCard = ({ label, value, sub, color = "amber", icon, onClick }) => {
 
         {/* Sub */}
         {sub && (
-          <p className="text-xs font-light mt-0.5 tracking-wider" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p className="text-xs font-light mt-0.5 tracking-wider" style={{ color: "rgba(255,255,255,0.50)" }}>
             {sub}
           </p>
         )}

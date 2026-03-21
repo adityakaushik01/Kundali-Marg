@@ -25,11 +25,11 @@ export const pageBg = {
   background: "linear-gradient(135deg, #0f172a 0%, #1e293b 35%, #0f2027 65%, #0f172a 100%)",
 };
 
-// Sidebar background
 export const sidebarBg = {
-  background:     "rgba(10,15,30,0.97)",
-  backdropFilter: "blur(24px)",
-  borderRight:    "1px solid rgba(255,255,255,0.08)",
+ text:   "#f59e0b",
+  bg:     "rgba(245,158,11,0.1)",
+  border: "rgba(245,158,11,0.22)",
+  glow:   "rgba(245,158,11,0.1)",
 };
 
 // Text readability scale

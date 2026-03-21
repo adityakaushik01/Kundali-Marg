@@ -1,4 +1,3 @@
-// components/dashboard/DashboardLayout.jsx
 // Reusable layout wrapper. Handles sidebar + topbar + main content.
 // Use this in User, Admin, and Astrologer dashboards.
 //
