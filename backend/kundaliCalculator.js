@@ -126,7 +126,7 @@ const calculatePlanet = (jd, planetId, ayanamsa) => {
 const calculateLagna = (jd, latitude, longitude, ayanamsa) => {
   return new Promise((resolve, reject) => {
 
-    // ✅ CORRECT: callback-based API
+    // CORRECT: callback-based API
     // result.ascendant = tropical ascendant degree
     // result.house[1..12] = tropical house cusps
     swisseph.swe_houses(jd, latitude, longitude, 'P', (result) => {
@@ -242,7 +242,7 @@ export const calculateAccurateKundali = async ({
       };
     }
 
-    // Lagna — now uses correct callback API ✅
+    // Lagna — now uses correct callback API
     const lagnaData = await calculateLagna(jd, latitude, longitude, ayanamsa);
 
     // Houses (Whole Sign)

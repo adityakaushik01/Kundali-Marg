@@ -310,7 +310,7 @@ const GenerateKundali = () => {
             </button>
             {/* Breadcrumb: Dashboard → Generate Kundali */}
             <div className="hidden lg:flex items-center gap-2 text-[11px] font-light tracking-[0.2em] uppercase">
-              <button onClick={() => navigate("/user-dashboard")}
+              <button onClick={() => navigate("/dashboard")}
                 className="transition-opacity hover:opacity-100 uppercase"
                 style={{ color:r(0.3) }}>
                 Dashboard
@@ -322,7 +322,7 @@ const GenerateKundali = () => {
 
           {/* Right — back button + avatar */}
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate("/user-dashboard")}
+            <button onClick={() => navigate("/dashboard")}
               className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-light tracking-widest uppercase transition-all hover:opacity-80"
               style={{ background:r(0.05), border:`1px solid ${r(0.1)}`, color:r(0.55) }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

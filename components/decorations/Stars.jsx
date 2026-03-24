@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const Stars = () => {
   const [stars, setStars] = useState([]);
+  const [particles, setParticles] = useState([]);
 
   useEffect(() => {
     // Generate random stars with more variety
     const generateStars = () => {
       const newStars = [];
-      for (let i = 0; i < 200; i++) { // More stars
+      for (let i = 0; i < 200; i++) {
+        // More stars
         const starType = Math.random();
         newStars.push({
           id: i,
@@ -16,21 +18,30 @@ const Stars = () => {
           size: Math.random() * 4 + 1, // Larger stars (1-5px)
           opacity: Math.random() * 0.9 + 0.3, // Higher opacity range
           // Different star types for variety
-          type: starType < 0.7 ? 'twinkle' : starType < 0.9 ? 'glow' : 'shooting',
+          type:
+            starType < 0.7 ? "twinkle" : starType < 0.9 ? "glow" : "shooting",
           delay: Math.random() * 8, // Random animation delay
-          duration: 1 + Math.random() * 4 // Random animation duration
+          duration: 1 + Math.random() * 4, // Random animation duration
         });
       }
       setStars(newStars);
     };
     generateStars();
+    const newParticles = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 3 + Math.random() * 4,
+      delay: Math.random() * 2,
+    }));
+    setParticles(newParticles);
   }, []);
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
       {/* Enhanced Stars */}
-      {stars.map(star => {
-        if (star.type === 'shooting') {
+      {stars.map((star) => {
+        if (star.type === "shooting") {
           return (
             <div
               key={star.id}
@@ -40,13 +51,13 @@ const Stars = () => {
                 top: `${star.top}%`,
                 animation: `shooting 4s linear infinite`,
                 animationDelay: `${star.delay}s`,
-                animationFillMode: 'both'
+                animationFillMode: "both",
               }}
             />
           );
         }
-        
-        if (star.type === 'glow') {
+
+        if (star.type === "glow") {
           return (
             <div
               key={star.id}
@@ -57,12 +68,12 @@ const Stars = () => {
                 width: `${star.size}px`,
                 height: `${star.size}px`,
                 opacity: star.opacity,
-                animation: `glow ${star.duration}s ease-in-out infinite alternate ${star.delay}s`
+                animation: `glow ${star.duration}s ease-in-out infinite alternate ${star.delay}s`,
               }}
             />
           );
         }
-        
+
         // Default twinkling stars
         return (
           <div
@@ -74,21 +85,21 @@ const Stars = () => {
               width: `${star.size}px`,
               height: `${star.size}px`,
               opacity: star.opacity,
-              animation: `twinkle ${star.duration}s ease-in-out infinite ${star.delay}s`
+              animation: `twinkle ${star.duration}s ease-in-out infinite ${star.delay}s`,
             }}
           />
         );
       })}
 
       {/* Floating particles for extra effect */}
-      {Array.from({ length: 30 }, (_, i) => (
+      {particles.map((p) => (
         <div
-          key={`particle-${i}`}
+          key={`particle-${p.id}`}
           className="absolute w-1 h-1 bg-blue-200 rounded-full opacity-40"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${3 + Math.random() * 4}s ease-in-out infinite ${Math.random() * 2}s`
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            animation: `float ${p.duration}s ease-in-out infinite ${p.delay}s`,
           }}
         />
       ))}
@@ -111,20 +122,24 @@ const Stars = () => {
             opacity: 0;
           }
         }
-        
+
         @keyframes glow {
           0% {
-            box-shadow: 0 0 6px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 255, 255, 0.3);
+            box-shadow:
+              0 0 6px rgba(255, 255, 255, 0.6),
+              0 0 12px rgba(255, 255, 255, 0.3);
             transform: scale(1);
             opacity: 0.7;
           }
           100% {
-            box-shadow: 0 0 12px rgba(255, 255, 255, 1), 0 0 24px rgba(255, 255, 255, 0.6);
+            box-shadow:
+              0 0 12px rgba(255, 255, 255, 1),
+              0 0 24px rgba(255, 255, 255, 0.6);
             transform: scale(1.3);
             opacity: 1;
           }
         }
-        
+
         @keyframes twinkle {
           0% {
             opacity: 0.4;
@@ -139,7 +154,7 @@ const Stars = () => {
             transform: scale(0.9);
           }
         }
-        
+
         @keyframes float {
           0% {
             transform: translateY(0px) translateX(0px);

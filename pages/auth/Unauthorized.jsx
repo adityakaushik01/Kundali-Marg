@@ -9,7 +9,7 @@ import useAuth from "../../hooks/useAuth";
 import { FcCancel } from "react-icons/fc";
 
 const ROLE_DASHBOARD = {
-  USER: "/user-dashboard",
+  USER: "/dashboard",
   ASTROLOGER: "/astrologer-dashboard",
   SUPER_ADMIN: "/admin-dashboard",
 };

@@ -304,3 +304,30 @@ export const verifyEmailOtp = async (req, res) => {
     res.status(500).json({ message: "Verification failed" });
   }
 };
+
+
+// Resend OTP
+export const resendOtp = async (req, res) => {
+  try {
+    const { email_address } = req.body;
+
+    const user = await User.findOne({ email_address });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.email_verified) {
+      return res.status(400).json({ message: "Email already verified. Please login." });
+    }
+
+    await sendOTP(user);
+
+    res.json({ message: "OTP sent successfully" });
+
+  } catch (error) {
+    logger.error("Resend OTP error", { error: error.message });
+
+    res.status(500).json({ message: "OTP sending failed" });
+  }
+    }

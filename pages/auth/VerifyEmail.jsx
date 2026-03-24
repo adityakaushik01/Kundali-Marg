@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
@@ -24,11 +24,61 @@ const VerifyEmail = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // NEW STATES
+  const [resending, setResending] = useState(false);
+  const [timer, setTimer] = useState(0);
+
+  // TIMER EFFECT
+  useEffect(() => {
+    let interval;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  // RESEND OTP FUNCTION
+  const handleResendOTP = async () => {
+    if (!formData.email_address) {
+      toast.error("Email is required");
+      return;
+    }
+
+    setResending(true);
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email_address: formData.email_address.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Failed to resend OTP");
+        setResending(false);
+        return;
+      }
+
+      toast.success("OTP sent again!");
+      setTimer(30); // cooldown
+    } catch (error) {
+      toast.error("Server error");
+    }
+
+    setResending(false);
   };
 
   const handleSubmit = async (e) => {
@@ -62,7 +112,7 @@ const VerifyEmail = () => {
       toast.success("Email verified successfully!");
 
       setTimeout(() => {
-        navigate("/user-dashboard");
+        navigate("/dashboard");
       }, 1000);
     } catch (error) {
       toast.error("Server error");
@@ -114,6 +164,24 @@ const VerifyEmail = () => {
                 className="w-full p-3 text-center tracking-[6px] text-lg rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all"
                 placeholder="------"
               />
+
+              {/* RESEND SECTION (NON-INTRUSIVE) */}
+              <div className="flex justify-between items-center text-xs mt-2">
+                <span className="opacity-60">Didn’t receive OTP?</span>
+
+                <button
+                  type="button"
+                  onClick={handleResendOTP}
+                  disabled={resending || timer > 0}
+                  className="cursor-pointer text-amber-400 hover:text-amber-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resending
+                    ? "Sending..."
+                    : timer > 0
+                    ? `Resend in ${timer}s`
+                    : "Resend OTP"}
+                </button>
+              </div>
             </div>
 
             {/* Button */}

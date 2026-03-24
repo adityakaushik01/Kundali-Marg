@@ -18,14 +18,14 @@ function App() {
       <ToasterProvider />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/generate-kundali" element={<GenerateKundali />} />
-        <Route path="/show-kundali" element={<ShowKundali />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route element={<ProtectedRoute role="USER" />}>
-          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/generate-kundali" element={<GenerateKundali />} />
+          <Route path="/show-kundali" element={<ShowKundali />} />
         </Route>
       </Routes>
     </AuthProvider>

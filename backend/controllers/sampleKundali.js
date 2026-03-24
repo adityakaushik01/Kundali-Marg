@@ -1,3 +1,5 @@
+import { calculateAccurateKundali } from "../kundaliCalculator.js";
+
 export const sampleKundali = async (req, res) => {
  
     try {

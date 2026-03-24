@@ -401,7 +401,7 @@ const ShowKundali = () => {
       {/* Same sidebar as dashboard */}
       <UserSidebar
         active=""
-        setActive={(tab) => navigate("/user-dashboard", { state: { tab } })}
+        setActive={(tab) => navigate("/dashboard", { state: { tab } })}
         sideOpen={sideOpen}
         setSideOpen={setSideOpen}
         onGenerate={() => navigate("/generate-kundali")}
@@ -425,7 +425,7 @@ const ShowKundali = () => {
               </svg>
             </button>
             <div className="hidden lg:flex items-center gap-2 text-[11px] font-light tracking-[0.2em] uppercase">
-              <button onClick={() => navigate("/user-dashboard")}
+              <button onClick={() => navigate("/dashboard")}
                 className="transition-opacity hover:opacity-100" style={{ color:r(0.3) }}>
                 Dashboard
               </button>

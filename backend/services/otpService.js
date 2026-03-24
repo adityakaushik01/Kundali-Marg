@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { generateOTP, getOTPExpiry, getOTPEmailTemplate } from "../utils/otpUtils.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
@@ -7,8 +6,9 @@ const OTP_COOLDOWN = 30 * 1000; // 30 seconds
 export const sendOTP = async (user) => {
   // 1. Cooldown check
   if (user.last_otp_sent && Date.now() - user.last_otp_sent < OTP_COOLDOWN) {
-    throw new Error("Please wait before requesting OTP again");
-  }
+  const secondsLeft = Math.ceil((OTP_COOLDOWN - (Date.now() - user.last_otp_sent)) / 1000);
+  throw new Error(`Please wait ${secondsLeft} seconds before requesting OTP again`);
+}
 
   // 2. Generate OTP
   const otp = generateOTP();
