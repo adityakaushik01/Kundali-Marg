@@ -16,6 +16,8 @@ const ToasterProvider = () => (
         warning: "!border-orange-400/30 [&_[data-title]]:!text-orange-400",
         info: "!border-sky-400/30   [&_[data-title]]:!text-sky-400",
         loading: "!border-slate-500/30 [&_[data-title]]:!text-amber-400",
+        actionButton: "!bg-rose-400/10 !border !border-rose-400/40 !text-rose-400/90 !font-light !tracking-wider !rounded-lg !text-xs",
+        cancelButton: "!bg-white/5 !border !border-white/10 !text-white/40 !font-light !tracking-wider !rounded-lg !text-xs",
       },
     }}
     icons={{

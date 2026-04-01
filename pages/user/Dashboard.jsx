@@ -20,6 +20,7 @@ import { FaPlus } from "react-icons/fa";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
+import { toast } from "sonner";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -444,8 +445,7 @@ const Overview = ({
 // FIX: Added onView to props — used when user clicks a kundali card
 const MyKundalis = ({ navigate, kundalis, loading, onDelete, onView }) => {
   const handleDelete = async (e, id) => {
-    e.stopPropagation(); // don't trigger row click
-    if (!confirm("Delete this Kundali?")) return;
+    e.stopPropagation();
     onDelete(id);
   };
 
@@ -1031,21 +1031,33 @@ const UserDashboard = () => {
         },
       });
     } catch {
-      alert("Failed to load kundali. Please try again.");
+      toast.error("Failed to load kundali. Please try again.");
     }
   };
 
   // Delete kundali
   const handleDelete = async (id) => {
-    try {
-      await fetch(`${BACKEND_URL}/api/kundali/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      setKundalis((prev) => prev.filter((k) => k._id !== id));
-    } catch {
-      alert("Failed to delete kundali");
-    }
+    toast("Delete this Kundali?", {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await fetch(`${BACKEND_URL}/api/kundali/${id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            setKundalis((prev) => prev.filter((k) => k._id !== id));
+            toast.success("Kundali deleted successfully");
+          } catch {
+            toast.error("Failed to delete kundali");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+      },
+    });
   };
 
   const sidebarUser = {
