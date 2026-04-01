@@ -125,7 +125,7 @@ const Overview = ({
       icon: <FaStroopwafel />,
     },
     {
-      label: "AI Questions - (Coming Soon)",
+      label: "AI Questions",
       value: userLoading ? "…" : String(userData?.ai_question_count ?? 0),
       sub: "Asked to AI",
       color: "teal",
@@ -363,21 +363,11 @@ const Overview = ({
             </div>
           </button>
 
-          {/* Ask AI — coming soon */}
+          {/* Ask AI */}
           <div
             className="p-5 rounded-xl text-left relative"
             style={glass(COLORS.teal.border)}
           >
-            <span
-              className="absolute top-4 right-4 text-[10px] px-2 py-0.5 rounded-full tracking-wider"
-              style={{
-                background: COLORS.teal.bg,
-                color: COLORS.teal.text,
-                border: `1px solid ${COLORS.teal.border}`,
-              }}
-            >
-              SOON
-            </span>
             <div
               className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
               style={{
