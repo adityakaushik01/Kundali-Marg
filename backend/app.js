@@ -8,6 +8,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.js";
 import kundaliRoutes from "./routes/kundaliRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", kundaliRoutes);
 app.use("/api/kundali", kundaliRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/ai", aiRoutes);
 
 // ── 404 Handler ─────────────────────────────
 app.use(notFound);

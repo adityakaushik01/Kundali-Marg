@@ -6,13 +6,14 @@ import ZodiacRing from "../../components/decorations/ZodiacRing";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Signup = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -146,15 +147,30 @@ const Signup = () => {
 
             <div>
               <label className="text-sm opacity-80">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all"
-                placeholder="Enter your password"
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 pr-10 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all"
+                  placeholder="Enter your password"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-amber-400 transition"
+                >
+                  {showPassword ? (
+                    <AiOutlineEyeInvisible size={20} />
+                  ) : (
+                    <AiOutlineEye size={20} />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

@@ -1035,7 +1035,7 @@ const UserDashboard = () => {
       const full = await res.json();
       navigate("/show-kundali", {
         state: {
-          kundaliData: full.kundali_data,
+          kundaliData: { ...full.kundali_data, _id: full._id },
           name: full.name,
           birthDetails: full.birth_details,
         },
