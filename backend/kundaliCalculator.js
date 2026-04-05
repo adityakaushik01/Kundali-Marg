@@ -1,7 +1,3 @@
-// kundaliCalculator.js
-// Complete Vedic Kundali Calculator using Swiss Ephemeris (swisseph)
-// Calculates: Planets, Lagna, Houses, Nakshatras, Retrograde, Rasi Chart
-
 import swisseph from 'swisseph';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -103,6 +99,7 @@ const calculatePlanet = (jd, planetId, ayanamsa) => {
     const flags = swisseph.SEFLG_SPEED | swisseph.SEFLG_SWIEPH;
     swisseph.swe_calc_ut(jd, planetId, flags, (result) => {
       if (result.error) { reject(new Error(result.error)); return; }
+      // console.log('RAW swisseph planet result:', JSON.stringify(result, null, 2));
       const tropicalLon = result.longitude;
       const siderealLon = norm360(tropicalLon - ayanamsa);
       const speed       = result.longitudeSpeed;
@@ -132,7 +129,7 @@ const calculateLagna = (jd, latitude, longitude, ayanamsa) => {
     swisseph.swe_houses(jd, latitude, longitude, 'P', (result) => {
 
       if (result.error) { reject(new Error(result.error)); return; }
-
+// console.log('RAW swisseph houses result:', JSON.stringify(result, null, 2));
       // Ascendant is the same regardless of house system ('P' Placidus or 'W' Whole Sign)
       const tropicalAsc = result.ascendant;
       const siderealAsc = norm360(tropicalAsc - ayanamsa);
@@ -270,9 +267,7 @@ export const calculateAccurateKundali = async ({
       speed:         p.speed || 0,
     }));
 
-    return {
-      status: 'success',
-      data: {
+    const finalOutput = { status: 'success', data: {
         birth_details: {
           name,
           datetime_utc:   datetime.toISOString(),
@@ -313,6 +308,9 @@ export const calculateAccurateKundali = async ({
         },
       },
     };
+
+// console.log('FINAL KUNDALI OUTPUT:', JSON.stringify(finalOutput, null, 2));
+return finalOutput;
 
   } catch (error) {
     console.error('Kundali calculation error:', error);
