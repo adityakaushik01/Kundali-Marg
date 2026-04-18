@@ -24,7 +24,7 @@ export const DASHA_YEARS = {
 
 const NAKSHATRA_SIZE = 13.3333333333;
 
-// ✅ Calculate remaining dasha at birth
+//  Calculate remaining dasha at birth
 export function calculateDashaBalance(degreeInNakshatra, dashaYears) {
   const remainingFraction =
     (NAKSHATRA_SIZE - degreeInNakshatra) / NAKSHATRA_SIZE;
@@ -32,7 +32,7 @@ export function calculateDashaBalance(degreeInNakshatra, dashaYears) {
   return remainingFraction * dashaYears;
 }
 
-// ✅ Add years with precision (handles decimals properly)
+//  Add years with precision (handles decimals properly)
 function addYears(date, years) {
   const result = new Date(date);
   const days = years * 365.25; // better accuracy
@@ -40,7 +40,7 @@ function addYears(date, years) {
   return result;
 }
 
-// ✅ Generate full Mahadasha timeline
+//  Generate full Mahadasha timeline
 export function generateMahadashaTimeline(
   birthDate,
   startLord,
@@ -82,13 +82,48 @@ export function generateMahadashaTimeline(
   return timeline;
 }
 
-// ✅ Get current Mahadasha
+// Get current Mahadasha
 export function getCurrentDasha(timeline) {
   const now = new Date();
 
   return (
     timeline.find(
-      (d) => now >= d.start && now <= d.end
+      (d) => now >= new Date(d.start) && now <= new Date(d.end)
     ) || null
   );
+}
+
+// Generate Antardashas for a given Mahadasha
+export function generateAntardashas(mahadasha) {
+  const lord = mahadasha.lord;
+  const totalYears = DASHA_YEARS[lord];
+  const startIndex = DASHA_ORDER.indexOf(lord);
+  const antardashas = [];
+  let currentDate = new Date(mahadasha.start);
+
+  for (let i = 0; i < DASHA_ORDER.length; i++) {
+    const antarLord = DASHA_ORDER[(startIndex + i) % DASHA_ORDER.length];
+    const antarYears = (DASHA_YEARS[antarLord] * totalYears) / 120;
+    const endDate = addYears(currentDate, antarYears);
+
+    antardashas.push({
+      lord: antarLord,
+      start: new Date(currentDate),
+      end: new Date(endDate),
+    });
+
+    currentDate = endDate;
+  }
+
+  return antardashas;
+}
+
+// Get current Antardasha
+export function getCurrentAntardasha(timeline) {
+  const now = new Date();
+  const currentMaha = getCurrentDasha(timeline);
+  if (!currentMaha) return null;
+
+  const antardashas = generateAntardashas(currentMaha);
+  return antardashas.find(a => now >= new Date(a.start) && now <= new Date(a.end)) || null;
 }

@@ -1023,9 +1023,10 @@ const UserDashboard = () => {
       });
       if (!res.ok) throw new Error();
       const full = await res.json();
+      console.log("full kundali data", full);
       navigate("/show-kundali", {
         state: {
-          kundaliData: { ...full.kundali_data, _id: full._id },
+          kundaliData: {...full.kundali_data, _id: full._id, dasha_timeline: full.dasha_timeline},
           name: full.name,
           birthDetails: full.birth_details,
         },

@@ -2,7 +2,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import aiChat from "../models/aiChat.js";
 import Kundali from "../models/Kundali.js";
 import User from "../models/User.js";
-import { FREE_AI_LIMIT } from "../config/limits.js";
+import { FREE_AI_LIMIT, UNLIMITED_AI_LIMIT } from "../config/limits.js";
+import { getCurrentDasha, getCurrentAntardasha, generateAntardashas } from "../utils/dashaCalculation.js";
 
 // ── Build system prompt from kundali data ─────────────────────────────────────
 const buildSystemPrompt = (kundaliDoc, personName) => {
@@ -34,6 +35,33 @@ const buildSystemPrompt = (kundaliDoc, personName) => {
   const moon = planets.find(p => p.name === "Moon");
   const sun = planets.find(p => p.name === "Sun");
 
+  const timeline = kundaliDoc.dasha_timeline || [];
+  const currentDasha = getCurrentDasha(timeline);
+  const currentAntar = getCurrentAntardasha(timeline);
+
+  const nextDasha = (() => {
+    if (!currentDasha) return null;
+    const idx = timeline.findIndex(d => new Date(d.start).getTime() === new Date(currentDasha.start).getTime());
+    return idx !== -1 && idx + 1 < timeline.length ? timeline[idx + 1] : null;
+  })();
+
+  const dashaLine = currentDasha
+    ? `Current Mahadasha: ${currentDasha.lord} (${new Date(currentDasha.start).toLocaleDateString("en-IN")} to ${new Date(currentDasha.end).toLocaleDateString("en-IN")})`
+    : "Dasha data unavailable";
+
+  const antarLine = currentAntar
+    ? `Current Antardasha: ${currentDasha.lord}-${currentAntar.lord} (${new Date(currentAntar.start).toLocaleDateString("en-IN")} to ${new Date(currentAntar.end).toLocaleDateString("en-IN")})`
+    : "";
+
+  const nextDashaLine = nextDasha
+    ? `Next Mahadasha: ${nextDasha.lord} (${new Date(nextDasha.start).toLocaleDateString("en-IN")} to ${new Date(nextDasha.end).toLocaleDateString("en-IN")})`
+    : "";
+
+    const allAntardashas = currentDasha ? generateAntardashas(currentDasha) : [];
+const antardashaLines = allAntardashas
+  .map(a => `  ${currentDasha.lord}-${a.lord}: ${new Date(a.start).toLocaleDateString("en-IN")} to ${new Date(a.end).toLocaleDateString("en-IN")}`)
+  .join("\n");
+
   return `
 You are Nakshatra AI, an experienced and wise Vedic astrologer. You are having a natural, flowing conversation with ${personName || "a seeker"}.
 
@@ -47,7 +75,9 @@ PERSONALITY:
 
 RULES:
 - Answer ONLY based on the Kundali data provided below
-- Do NOT make extreme predictions about death, disasters, or definitive life events
+- Do NOT make predictions about death, serious illness, or disasters
+- You CAN and SHOULD give specific time predictions for career, marriage, finances, and education etc based on Dasha periods
+- When asked "when will X happen", always give a specific time window based on Dasha/Antardasha periods
 - Do not repeat the person's name in every response — use it sparingly and naturally
 - Keep responses concise — 2 to 4 paragraphs max
 - Always end with a gentle reminder that astrology is for guidance, not certainty — but only once per conversation, not every message
@@ -61,6 +91,11 @@ Place of Birth: ${birth.place || "—"}
 Ascendant (Lagna): ${getSign(1)}
 Moon Sign (Rashi): ${moon?.sign || "—"}
 Sun Sign: ${sun?.sign || "—"}
+${dashaLine}
+${antarLine}
+${nextDashaLine}
+ANTARDASHA TIMELINE (all sub-periods of current Mahadasha):
+${antardashaLines}
 Ayanamsa: ${bd.ayanamsaName || "Lahiri"} (${bd.ayanamsa || ""}°)
 Latitude: ${bd.latitude || "—"}
 Longitude: ${bd.longitude || "—"}
@@ -88,7 +123,8 @@ export const askAI = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.ai_question_count >= FREE_AI_LIMIT) {
+    const aiLimit = user.is_premium ? UNLIMITED_AI_LIMIT : FREE_AI_LIMIT;
+    if (aiLimit !== UNLIMITED_AI_LIMIT && user.ai_question_count >= aiLimit) {
       return res.status(403).json({ message: "Free AI message limit reached. Please upgrade to continue." });
     }
 
@@ -98,6 +134,7 @@ export const askAI = async (req, res) => {
     }
 
     const systemPrompt = buildSystemPrompt(kundaliDoc, kundaliDoc.name);
+    console.log("systemPrompt", systemPrompt);
 
     let chat = await aiChat.findOne({ user_id, kundali_id });
     if (!chat) {
@@ -125,8 +162,11 @@ export const askAI = async (req, res) => {
     });
 
     const chatSession = model.startChat({ history: geminiHistory });
+    console.log('chatSession: ', chatSession);
     const result = await chatSession.sendMessage(message);
+    console.log('result: ', result);
     const reply = result.response.text();
+    console.log('reply: ', reply);
 
     chat.messages.push({ role: "ai", text: reply });
     await chat.save();

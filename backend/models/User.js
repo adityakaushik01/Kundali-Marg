@@ -74,9 +74,16 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  last_otp_sent: Date
-}, {
-  collection: "user"
-});
+
+  last_otp_sent: Date,
+
+  is_premium: {
+    type: Boolean,
+    default: false
+  }
+},
+  {
+    collection: "user"
+  });
 
 export default mongoose.model("User", userSchema);

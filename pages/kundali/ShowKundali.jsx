@@ -8,6 +8,13 @@ import BottomDecorativeElement from "../../components/decorations/BottomDecorati
 import ZodiacRing from "../../components/decorations/ZodiacRing";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import { FaStroopwafel } from "react-icons/fa6";
+import { IoPlanetSharp } from "react-icons/io5";
+import { GiHouse } from "react-icons/gi";
+import { BiSolidDetail } from "react-icons/bi";
+import { RiRobot3Line } from "react-icons/ri";
+import { GiTimeSynchronization } from "react-icons/gi";
+import { GiYinYang } from "react-icons/gi";
 
 import UserSidebar from "../../components/user/Sidebar";
 import { glass, COLORS, pageBg } from "../../components/dashboard/theme";
@@ -209,7 +216,7 @@ const ShowKundali = () => {
 
   const { kundaliData, name, birthDetails } = location.state || {};
   console.log("location.state:", location.state);
-  console.log("kundaliData:", kundaliData);
+  console.log("kundaliData check:", kundaliData);
 
   const [activeTab, setActiveTab] = useState("chart");
   const [lang, setLang] = useState("en");
@@ -831,6 +838,467 @@ const ShowKundali = () => {
     );
   };
 
+
+  // ── DashaTimeline ─────────────────────────────────────────────────────────
+const DashaTimeline = () => {
+  const timeline = kundaliData?.dasha_timeline || [];
+  const now = new Date();
+
+  const DASHA_YEARS = {
+    Ketu: 7, Venus: 20, Sun: 6, Moon: 10,
+    Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17,
+  };
+
+  const DASHA_ORDER = [
+    "Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury",
+  ];
+
+  const planetColors = {
+    Sun: "#f59e0b", Moon: "#a78bfa", Mars: "#ef4444",
+    Mercury: "#10b981", Jupiter: "#f59e0b", Venus: "#ec4899",
+    Saturn: "#6366f1", Rahu: "#64748b", Ketu: "#78716c",
+  };
+
+  const generateAntardashas = (mahadasha) => {
+    const lord = mahadasha.lord;
+    const totalYears = DASHA_YEARS[lord];
+    const startIndex = DASHA_ORDER.indexOf(lord);
+    const antardashas = [];
+    let currentDate = new Date(mahadasha.start);
+    for (let i = 0; i < DASHA_ORDER.length; i++) {
+      const antarLord = DASHA_ORDER[(startIndex + i) % DASHA_ORDER.length];
+      const antarYears = (DASHA_YEARS[antarLord] * totalYears) / 120;
+      const days = antarYears * 365.25;
+      const endDate = new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+      antardashas.push({ lord: antarLord, start: new Date(currentDate), end: new Date(endDate) });
+      currentDate = endDate;
+    }
+    return antardashas;
+  };
+
+  const currentMaha = timeline.find(d => now >= new Date(d.start) && now <= new Date(d.end));
+  const [expandedIdx, setExpandedIdx] = useState(
+    timeline.findIndex(d => now >= new Date(d.start) && now <= new Date(d.end))
+  );
+
+  const fmt = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+  const getProgress = (start, end) => {
+    const total = new Date(end) - new Date(start);
+    const elapsed = now - new Date(start);
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  };
+
+  if (!timeline.length) {
+    return (
+      <div className="text-center py-16" style={{ color: r(0.3) }}>
+        <p className="text-sm font-light">Dasha data not available. Please regenerate this Kundali.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Header card */}
+      <div style={glass(COLORS.amber.border)}>
+        <div className="px-6 py-4" style={{ borderBottom: `1px solid ${r(0.07)}` }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-0.5" style={{ color: r(0.3) }}>
+            {lang === "hi" ? "विंशोत्तरी दशा" : "Vimshottari Dasha"}
+          </p>
+          <h3 className="text-sm font-light tracking-wider" style={{ color: r(0.85) }}>
+            {lang === "hi" ? "महादशा काल रेखा" : "Mahadasha Timeline"}
+          </h3>
+        </div>
+        {currentMaha && (
+          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { label: lang === "hi" ? "वर्तमान महादशा" : "Current Mahadasha", value: currentMaha.lord },
+              { label: lang === "hi" ? "प्रारंभ" : "Started", value: fmt(currentMaha.start) },
+              { label: lang === "hi" ? "समाप्ति" : "Ends", value: fmt(currentMaha.end) },
+            ].map(({ label, value }) => (
+              <div key={label} className="text-center p-4 rounded-xl"
+                style={{ background: COLORS.amber.bg, border: `1px solid ${COLORS.amber.border}` }}>
+                <p className="text-[10px] tracking-wider uppercase mb-1.5" style={{ color: r(0.35) }}>{label}</p>
+                <p className="text-sm font-light" style={{ color: r(0.9) }}>{value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Timeline */}
+      <div style={glass()}>
+        <div className="px-6 py-4" style={{ borderBottom: `1px solid ${r(0.07)}` }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-0.5" style={{ color: r(0.3) }}>
+            {lang === "hi" ? "सभी महादशा" : "All Mahadashas"}
+          </p>
+          <h3 className="text-sm font-light tracking-wider" style={{ color: r(0.85) }}>
+            {lang === "hi" ? "दशा विस्तार" : "Click to expand Antardashas"}
+          </h3>
+        </div>
+        <div className="p-4 space-y-2">
+          {timeline.map((dasha, idx) => {
+            const isCurrent = currentMaha && new Date(dasha.start).getTime() === new Date(currentMaha.start).getTime();
+            const isPast = now > new Date(dasha.end);
+            const isExpanded = expandedIdx === idx;
+            const progress = isCurrent ? getProgress(dasha.start, dasha.end) : 0;
+            const antardashas = isExpanded ? generateAntardashas(dasha) : [];
+            const color = planetColors[dasha.lord] || COLORS.amber.text;
+
+            return (
+              <div key={idx}>
+                <button
+                  onClick={() => setExpandedIdx(isExpanded ? -1 : idx)}
+                  className="w-full text-left p-4 rounded-xl transition-all duration-200"
+                  style={{
+                    background: isCurrent ? `${color}15` : r(0.03),
+                    border: `1px solid ${isCurrent ? color + "40" : r(0.07)}`,
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        style={{ background: isPast ? r(0.2) : color }} />
+                      <span className="text-sm font-light" style={{ color: isPast ? r(0.35) : r(0.9) }}>
+                        {dasha.lord} {lang === "hi" ? "महादशा" : "Mahadasha"}
+                      </span>
+                      {isCurrent && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-light"
+                          style={{ background: `${color}25`, color, border: `1px solid ${color}40` }}>
+                          {lang === "hi" ? "वर्तमान" : "Current"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-light hidden sm:block" style={{ color: r(0.35) }}>
+                        {fmt(dasha.start)} — {fmt(dasha.end)}
+                      </span>
+                      <span style={{ color: r(0.3), fontSize: "10px" }}>{isExpanded ? "▲" : "▼"}</span>
+                    </div>
+                  </div>
+                  <div className="sm:hidden text-xs font-light mb-2" style={{ color: r(0.3) }}>
+                    {fmt(dasha.start)} — {fmt(dasha.end)}
+                  </div>
+                  {isCurrent && (
+                    <div className="mt-2 rounded-full overflow-hidden" style={{ height: "3px", background: r(0.08) }}>
+                      <div className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${progress}%`, background: color }} />
+                    </div>
+                  )}
+                </button>
+
+                {/* Antardashas */}
+                {isExpanded && (
+                  <div className="ml-4 mt-1 space-y-1 pl-3" style={{ borderLeft: `1px solid ${r(0.08)}` }}>
+                    {antardashas.map((antar, ai) => {
+                      const isCurrentAntar = now >= new Date(antar.start) && now <= new Date(antar.end);
+                      const isAntarPast = now > new Date(antar.end);
+                      const antarColor = planetColors[antar.lord] || COLORS.amber.text;
+                      return (
+                        <div key={ai} className="p-3 rounded-lg"
+                          style={{
+                            background: isCurrentAntar ? `${antarColor}10` : r(0.02),
+                            border: `1px solid ${isCurrentAntar ? antarColor + "30" : r(0.05)}`,
+                          }}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                style={{ background: isAntarPast ? r(0.15) : antarColor }} />
+                              <span className="text-xs font-light"
+                                style={{ color: isAntarPast ? r(0.3) : r(0.75) }}>
+                                {dasha.lord}-{antar.lord}
+                              </span>
+                              {isCurrentAntar && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full"
+                                  style={{ background: `${antarColor}20`, color: antarColor }}>
+                                  {lang === "hi" ? "अभी" : "Now"}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] font-light" style={{ color: r(0.25) }}>
+                              {fmt(antar.start)} — {fmt(antar.end)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── YogaDetection ─────────────────────────────────────────────────────────
+const YogaDetection = () => {
+  const planets = kundaliData?.data?.planets || [];
+  const rasi = kundaliData?.data?.chart?.rasi || [];
+
+  const getPlanet = (name) => planets.find(p => p.name === name);
+  const getHouseOf = (name) => getPlanet(name)?.house;
+  const isConjunct = (p1, p2) => getHouseOf(p1) === getHouseOf(p2);
+
+  const yogas = [];
+
+  const moon = getPlanet("Moon");
+  const jupiter = getPlanet("Jupiter");
+
+  // Gajakesari Yoga
+  if (moon && jupiter) {
+    const diff = ((jupiter.house - moon.house + 12) % 12);
+    if ([0, 3, 6, 9].includes(diff)) {
+      yogas.push({
+        name: "Gajakesari Yoga",
+        Sanskrit: "गजकेसरी योग",
+        present: true,
+        what: "Formed when Jupiter occupies a kendra house (1st, 4th, 7th, or 10th) from the Moon.",
+        impact: "Blesses the native with sharp intellect, strong personality, fame, and wealth. The person is often respected in society and has natural leadership qualities.",
+        areas: "Career, reputation, wisdom, social status",
+        strength: "Strong",
+        color: COLORS.amber,
+      });
+    }
+  }
+
+  // Budhaditya Yoga
+  if (isConjunct("Sun", "Mercury")) {
+    yogas.push({
+      name: "Budhaditya Yoga",
+      Sanskrit: "बुधादित्य योग",
+      present: true,
+      what: "Formed when Sun and Mercury are conjunct in the same house.",
+      impact: "Gives exceptional intelligence, eloquence, and communication skills. The native excels in fields requiring analytical thinking, writing, or public speaking.",
+      areas: "Intelligence, communication, business, education",
+      strength: "Strong",
+      color: COLORS.amber,
+    });
+  }
+
+  // Chandra-Mangal Yoga
+  if (isConjunct("Moon", "Mars")) {
+    yogas.push({
+      name: "Chandra-Mangal Yoga",
+      Sanskrit: "चंद्र-मंगल योग",
+      present: true,
+      what: "Formed when Moon and Mars occupy the same house in the birth chart.",
+      impact: "Gives strong determination, courage, and drive. Often associated with financial success through one's own efforts. The native is emotionally intense and highly motivated.",
+      areas: "Finance, ambition, real estate, courage",
+      strength: "Moderate",
+      color: COLORS.teal,
+    });
+  }
+
+  // Mahabhagya Yoga
+  const beneficsInTrikona = ["Jupiter", "Venus", "Moon"].filter(p =>
+    [1, 5, 9].includes(getHouseOf(p))
+  );
+  if (beneficsInTrikona.length >= 2) {
+    yogas.push({
+      name: "Mahabhagya Yoga",
+      Sanskrit: "महाभाग्य योग",
+      present: true,
+      what: "Formed when two or more natural benefics (Jupiter, Venus, Moon) are placed in trine houses (1st, 5th, or 9th).",
+      impact: "One of the most auspicious yogas. Indicates exceptional luck, divine blessings, and a life filled with opportunities. The native is generally fortunate in most endeavors.",
+      areas: "Overall fortune, spirituality, relationships, success",
+      strength: "Strong",
+      color: COLORS.amber,
+    });
+  }
+
+  // Raj Yoga
+  const kendraHouses = [1, 4, 7, 10];
+  const trikonaHouses = [1, 5, 9];
+  const kendraLords = kendraHouses.map(h => rasi.find(r => r.house === h)?.lord).filter(Boolean);
+  const trikonaLords = trikonaHouses.map(h => rasi.find(r => r.house === h)?.lord).filter(Boolean);
+  const rajYogaPlanets = kendraLords.filter(p => trikonaLords.includes(p));
+  if (rajYogaPlanets.length > 0) {
+    yogas.push({
+      name: "Raj Yoga",
+      Sanskrit: "राज योग",
+      present: true,
+      what: "Formed when the lord of a kendra house (1,4,7,10) is also the lord of a trikona house (1,5,9).",
+      impact: "The most celebrated yoga in Vedic astrology. Indicates rise to power, authority, and high status. The native achieves success in career and is respected like royalty in their field.",
+      areas: "Career, authority, fame, political or social power",
+      strength: "Strong",
+      color: COLORS.amber,
+    });
+  }
+
+  // Dhana Yoga
+  const lord2 = rasi.find(r => r.house === 2)?.lord;
+  const lord11 = rasi.find(r => r.house === 11)?.lord;
+  if (lord2 && lord11 && lord2 !== lord11) {
+    const l2House = getHouseOf(lord2);
+    const l11House = getHouseOf(lord11);
+    if (l2House === l11House || l2House === 11 || l11House === 2) {
+      yogas.push({
+        name: "Dhana Yoga",
+        Sanskrit: "धन योग",
+        present: true,
+        what: "Formed when the lords of the 2nd house (wealth) and 11th house (gains) are conjunct or placed in each other's houses.",
+        impact: "Indicates strong potential for financial prosperity and wealth accumulation. The native often earns well and is able to build significant assets over their lifetime.",
+        areas: "Wealth, income, savings, financial security",
+        strength: "Moderate",
+        color: COLORS.teal,
+      });
+    }
+  }
+
+  // Saraswati Yoga
+  const saraswatiPlanets = ["Jupiter", "Venus", "Mercury"].filter(p =>
+    [...kendraHouses, ...trikonaHouses].includes(getHouseOf(p))
+  );
+  if (saraswatiPlanets.length === 3) {
+    yogas.push({
+      name: "Saraswati Yoga",
+      Sanskrit: "सरस्वती योग",
+      present: true,
+      what: "Formed when Jupiter, Venus, and Mercury are all placed in kendra or trikona houses simultaneously.",
+      impact: "Blesses the native with extraordinary intelligence, artistic talent, and creative expression. Such persons often excel in arts, music, literature, or academia and gain widespread recognition.",
+      areas: "Arts, creativity, education, music, literature",
+      strength: "Strong",
+      color: COLORS.amber,
+    });
+  }
+
+  // Kemadruma Yoga
+  if (moon) {
+    const moonH = moon.house;
+    const prev = ((moonH - 2 + 12) % 12) + 1;
+    const next = (moonH % 12) + 1;
+    const adjPlanets = planets.filter(p =>
+      p.name !== "Moon" && p.name !== "Rahu" && p.name !== "Ketu" &&
+      (p.house === prev || p.house === next)
+    );
+    if (adjPlanets.length === 0) {
+      yogas.push({
+        name: "Kemadruma Yoga",
+        Sanskrit: "केमद्रुम योग",
+        present: true,
+        what: "Formed when no planet (except Rahu/Ketu) occupies the 2nd or 12th house from the Moon.",
+        impact: "May bring emotional instability, periods of loneliness, or struggles in early life. However, strong placements elsewhere can mitigate its effects significantly. Often the native develops great inner resilience.",
+        areas: "Mental peace, emotional stability, relationships",
+        strength: "Challenging",
+        color: COLORS.rose,
+      });
+    }
+  }
+
+  // Vipareeta Raj Yoga
+  const lord6 = rasi.find(r => r.house === 6)?.lord;
+  const lord8 = rasi.find(r => r.house === 8)?.lord;
+  const lord12 = rasi.find(r => r.house === 12)?.lord;
+  const dusthanaLords = [lord6, lord8, lord12].filter(Boolean);
+  const dusthanaHouses = [6, 8, 12];
+  const vipareetaPlanets = dusthanaLords.filter(p => dusthanaHouses.includes(getHouseOf(p)));
+  if (vipareetaPlanets.length >= 2) {
+    yogas.push({
+      name: "Vipareeta Raj Yoga",
+      Sanskrit: "विपरीत राज योग",
+      present: true,
+      what: "Formed when lords of the 6th, 8th, or 12th houses (dusthana) are placed in other dusthana houses.",
+      impact: "Indicates unexpected success and rise, often after going through difficulties or losses. The native tends to benefit from hidden sources. Success comes in a surprising or unconventional way.",
+      areas: "Hidden gains, overcoming adversity, unexpected success",
+      strength: "Moderate",
+      color: COLORS.teal,
+    });
+  }
+
+  const presentYogas = yogas.filter(y => y.present);
+
+  return (
+    <div className="space-y-5">
+      <div style={glass(COLORS.amber.border)}>
+        <div className="px-6 py-4" style={{ borderBottom: `1px solid ${r(0.07)}` }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-0.5" style={{ color: r(0.3) }}>
+            {lang === "hi" ? "ग्रह योग" : "Planetary Yogas"}
+          </p>
+          <h3 className="text-sm font-light tracking-wider" style={{ color: r(0.85) }}>
+            {lang === "hi" ? "योग विश्लेषण" : "Yoga Analysis"}
+          </h3>
+        </div>
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { label: lang === "hi" ? "कुल योग" : "Yogas Found", value: presentYogas.length },
+            { label: lang === "hi" ? "शुभ योग" : "Auspicious", value: presentYogas.filter(y => y.color !== COLORS.rose).length },
+            { label: lang === "hi" ? "चुनौती" : "Challenging", value: presentYogas.filter(y => y.color === COLORS.rose).length },
+          ].map(({ label, value }) => (
+            <div key={label} className="text-center p-4 rounded-xl"
+              style={{ background: COLORS.amber.bg, border: `1px solid ${COLORS.amber.border}` }}>
+              <p className="text-[10px] tracking-wider uppercase mb-1.5" style={{ color: r(0.35) }}>{label}</p>
+              <p className="text-2xl font-light" style={{ color: r(0.9) }}>{value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={glass()}>
+        <div className="px-6 py-4" style={{ borderBottom: `1px solid ${r(0.07)}` }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-0.5" style={{ color: r(0.3) }}>
+            {lang === "hi" ? "विस्तार" : "Details"}
+          </p>
+          <h3 className="text-sm font-light tracking-wider" style={{ color: r(0.85) }}>
+            {lang === "hi" ? "आपके योग" : "Your Yogas"}
+          </h3>
+        </div>
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {presentYogas.length === 0 ? (
+            <div className="col-span-2 text-center py-10">
+              <p className="text-sm font-light" style={{ color: r(0.3) }}>No major yogas detected in this chart.</p>
+            </div>
+          ) : (
+            presentYogas.map((yoga, i) => (
+              <div key={i} className="p-4 rounded-xl"
+                style={{
+                  background: `${yoga.color.text}08`,
+                  border: `1px solid ${yoga.color.text}25`,
+                }}>
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <h4 className="text-sm font-light tracking-wide" style={{ color: yoga.color.text }}>
+                      {yoga.name}
+                    </h4>
+                    <p className="text-[10px] font-light mt-0.5" style={{ color: r(0.3) }}>
+                      {yoga.Sanskrit}
+                    </p>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 font-light"
+                    style={{
+                      background: `${yoga.color.text}15`,
+                      color: yoga.color.text,
+                      border: `1px solid ${yoga.color.text}30`,
+                    }}>
+                    {yoga.strength}
+                  </span>
+                </div>
+                <div style={{ height: "1px", background: `${yoga.color.text}15`, marginBottom: "10px" }} />
+                {[
+                  { label: "What it is", value: yoga.what },
+                  { label: "Impact", value: yoga.impact },
+                  { label: "Life areas", value: yoga.areas },
+                ].map(({ label, value }) => (
+                  <div key={label} className="mb-2.5">
+                    <p className="text-[10px] tracking-wider uppercase mb-1" style={{ color: r(0.3) }}>
+                      {label}
+                    </p>
+                    <p className="text-xs font-light leading-relaxed" style={{ color: r(0.62) }}>
+                      {value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
   // ── AskAI — NEW TAB ───────────────────────────────────────────────────────
   const AskAI = () => {
     console.log("AskAI kundaliData._id:", kundaliData?._id);
@@ -856,7 +1324,7 @@ const ShowKundali = () => {
           setMessages([
             {
               role: "ai",
-              text: `Namaste${name ? ` ${name}` : ""}! 🙏 I have your Kundali details. Ask me anything about your birth chart.`,
+              text: `Namaste${name ? ` ${name}` : ""}! I am Nakshatra AI. I have your Kundali details. Ask me anything about your birth chart.`,
             },
           ]);
           setHistoryLoaded(true);
@@ -873,6 +1341,7 @@ const ShowKundali = () => {
             },
           );
           const data = await res.json();
+          console.log("kundali data", data);
 
           if (data.messages && data.messages.length > 0) {
             setMessages(data.messages);
@@ -880,7 +1349,7 @@ const ShowKundali = () => {
             setMessages([
               {
                 role: "ai",
-                text: `Namaste${name ? ` ${name}` : ""}! 🙏 I have your Kundali details. Ask me anything about your birth chart.`,
+                text: `Namaste${name ? ` ${name}` : ""}! I am Nakshatra AI. I have your Kundali details. Ask me anything about your birth chart.`,
               },
             ]);
           }
@@ -888,7 +1357,7 @@ const ShowKundali = () => {
           setMessages([
             {
               role: "ai",
-              text: `Namaste${name ? ` ${name}` : ""}! 🙏 Ask me anything about your Kundali.`,
+              text: `Namaste${name ? ` ${name}` : ""}! I am Nakshatra AI. Ask me anything about your Kundali.`,
             },
           ]);
         }
@@ -976,7 +1445,7 @@ const ShowKundali = () => {
             className="text-[10px] tracking-[0.3em] uppercase mb-0.5"
             style={{ color: r(0.3) }}
           >
-            AI Astrologer
+           Nakshatra - AI Astrologer
           </p>
           <h3
             className="text-sm font-light tracking-wider"
@@ -1037,7 +1506,7 @@ const ShowKundali = () => {
                         }
                   }
                 >
-                  {msg.role === "ai" ? "✦" : sidebarUser.initial}
+                  {msg.role === "ai" ? "N" : sidebarUser.initial}
                 </div>
                 <div
                   className="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-light leading-relaxed"
@@ -1071,7 +1540,7 @@ const ShowKundali = () => {
                   color: COLORS.amber.text,
                 }}
               >
-                ✦
+                N
               </div>
               <div
                 className="px-4 py-3 rounded-2xl"
@@ -1159,14 +1628,13 @@ const ShowKundali = () => {
   // ── Tabs config — AI tab added ────────────────────────────────────────────
   const tabs = [
     {
-      id: "chart",
-      label: lang === "hi" ? "कुंडली" : "Birth Chart",
-      icon: "🔮",
-    },
-    { id: "planets", label: lang === "hi" ? "ग्रह" : "Planets", icon: "🪐" },
-    { id: "houses", label: lang === "hi" ? "भाव" : "Houses", icon: "🏠" },
-    { id: "birth", label: lang === "hi" ? "विवरण" : "Details", icon: "📋" },
-    { id: "ai", label: lang === "hi" ? "AI ज्योतिष" : "Ask AI", icon: "✦" },
+      id: "chart", label: lang === "hi" ? "कुंडली" : "Birth Chart", icon: <FaStroopwafel />,},
+    { id: "planets", label: lang === "hi" ? "ग्रह" : "Planets", icon: <IoPlanetSharp /> },
+    { id: "houses", label: lang === "hi" ? "भाव" : "Houses", icon: <GiHouse /> },
+    { id: "birth", label: lang === "hi" ? "विवरण" : "Details", icon: <BiSolidDetail /> },
+    { id: "dasha", label: lang === "hi" ? "दशा" : "Dasha", icon: <GiTimeSynchronization /> },
+    { id: "yoga", label: lang === "hi" ? "योग" : "Yogas", icon: <GiYinYang /> },
+    { id: "ai", label: lang === "hi" ? "AI ज्योतिष" : "Ask AI", icon: <RiRobot3Line /> },
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -1334,7 +1802,7 @@ const ShowKundali = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-light tracking-wider transition-all duration-200"
+                className="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-full text-xs tracking-wider transition-all duration-200"
                 style={
                   activeTab === tab.id
                     ? {
@@ -1466,6 +1934,34 @@ const ShowKundali = () => {
             )}
 
             {activeTab === "birth" && <BirthDetails />}
+
+            {activeTab === "dasha" && (
+  <div>
+    <div className="mb-5">
+      <p className="text-[10px] tracking-[0.3em] uppercase mb-0.5" style={{ color: r(0.3) }}>
+        {lang === "hi" ? "विंशोत्तरी दशा" : "Vimshottari Dasha"}
+      </p>
+      <h3 className="text-base font-light tracking-wider" style={{ color: r(0.85) }}>
+        {lang === "hi" ? "महादशा एवं अंतर्दशा" : "Mahadasha & Antardasha"}
+      </h3>
+    </div>
+    <DashaTimeline />
+  </div>
+)}
+
+{activeTab === "yoga" && (
+  <div>
+    <div className="mb-5">
+      <p className="text-[10px] tracking-[0.3em] uppercase mb-0.5" style={{ color: r(0.3) }}>
+        {lang === "hi" ? "ग्रह योग" : "Planetary Yogas"}
+      </p>
+      <h3 className="text-base font-light tracking-wider" style={{ color: r(0.85) }}>
+        {lang === "hi" ? "योग विश्लेषण" : "Yoga Analysis"}
+      </h3>
+    </div>
+    <YogaDetection />
+  </div>
+)}
 
             {/* ── NEW AI TAB ── */}
 

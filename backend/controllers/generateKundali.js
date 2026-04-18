@@ -2,6 +2,7 @@ import { calculateAccurateKundali } from "../kundaliCalculator.js";
 import User from "../models/User.js";
 import Kundali from "../models/Kundali.js";
 import { FREE_KUNDALI_LIMIT } from "../config/limits.js";
+import { calculateDashaBalance, generateMahadashaTimeline, DASHA_ORDER, DASHA_YEARS } from "../utils/dashaCalculation.js";
 
 export const generateKundali = async (req, res) => {
 
@@ -101,6 +102,13 @@ export const generateKundali = async (req, res) => {
 
     console.log("Kundali calculation completed successfully", JSON.stringify(kundaliData, null, 2));
 
+    const moon = kundaliData.data.planets.find(p => p.name === "Moon");
+const moonNakshatraIndex = Math.floor(moon.absoluteDegree / 13.3333333333);
+const startLord = DASHA_ORDER[moonNakshatraIndex % 9];
+const degreeInNakshatra = moon.absoluteDegree % 13.3333333333;
+const balanceYears = calculateDashaBalance(degreeInNakshatra, DASHA_YEARS[startLord]);
+const dashaTimeline = generateMahadashaTimeline(birthDate, startLord, balanceYears);
+
     kundaliData.request_info = {
       processed_at: new Date().toISOString(),
       birth_datetime_utc: birthDate.toISOString(),
@@ -132,6 +140,7 @@ export const generateKundali = async (req, res) => {
         longitude: lng,
         timezone: timezone || "",
       },
+      dasha_timeline: dashaTimeline,
       kundali_data: kundaliData,
     });
 
@@ -142,6 +151,7 @@ export const generateKundali = async (req, res) => {
 
     res.json({
       ...kundaliData,
+      dasha_timeline: savedKundali.dasha_timeline,
       kundali_id: savedKundali._id,
     });
 

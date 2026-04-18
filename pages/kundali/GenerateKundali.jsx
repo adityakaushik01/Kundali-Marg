@@ -300,16 +300,16 @@ const GenerateKundali = () => {
 
       if (data.status === "success" && data.data) {
         navigate("/show-kundali", {
-          state: {
-            kundaliData: { ...data, _id: data.kundali_id },
-            name: formData.name.trim(),
-            birthDetails: {
-              date: combinedDateTime.format("DD/MM/YYYY"),
-              time: combinedDateTime.format("hh:mm A"),
-              place: formData.address,
-            },
-          },
-        });
+  state: {
+    kundaliData: { ...data, _id: data.kundali_id, dasha_timeline: data.dasha_timeline },
+    name: formData.name.trim(),
+    birthDetails: {
+      date: combinedDateTime.format("DD/MM/YYYY"),
+      time: combinedDateTime.format("hh:mm A"),
+      place: formData.address,
+    },
+  },
+});
       } else {
         throw new Error(data.message || "Failed to generate kundali");
       }
@@ -745,8 +745,7 @@ const GenerateKundali = () => {
                         Calculating positions...
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <span>✦</span>
+                      <div className="cursor-pointer flex items-center justify-center gap-2">
                         Generate Kundali
                       </div>
                     )}

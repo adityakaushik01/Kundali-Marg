@@ -1,27 +1,26 @@
-// backend/models/Kundali.js
 import mongoose from "mongoose";
 
 const kundaliSchema = new mongoose.Schema({
 
   user_id: {
-    type:     mongoose.Schema.Types.ObjectId,
-    ref:      "User",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
-    index:    true,
+    index: true,
   },
 
   name: {
-    type:     String,
+    type: String,
     required: true,
   },
 
   birth_details: {
-    date:      String,
-    time:      String,
-    place:     String,
-    latitude:  Number,
+    date: String,
+    time: String,
+    place: String,
+    latitude: Number,
     longitude: Number,
-    timezone:  String,
+    timezone: String,
   },
 
   kundali_data: {
@@ -29,10 +28,12 @@ const kundaliSchema = new mongoose.Schema({
   },
 
   createdAt: {
-    type:    Date,
+    type: Date,
     default: Date.now,
   },
-  
+
+  dasha_timeline: { type: Array, default: [] }
+
 }, {
   collection: "kundali"
 });
