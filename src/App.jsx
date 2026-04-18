@@ -1,5 +1,8 @@
 import "./App.css";
-import Home from "../pages/Home";
+import Home from "../pages/static/Home";
+import About from "../pages/static/About";
+import Services from "../pages/static/Services";
+import Blog from "../pages/static/Blog";
 import GenerateKundali from "../pages/kundali/GenerateKundali";
 import ShowKundali from "../pages/kundali//ShowKundali";
 import { Routes, Route } from "react-router-dom";
@@ -18,6 +21,9 @@ function App() {
       <ToasterProvider />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<VerifyEmail />} />

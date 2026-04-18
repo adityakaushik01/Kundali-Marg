@@ -1,15 +1,15 @@
-import Navbar from "../components/layout/Navbar";
-import ZodiacSignSection from "../components/layout/ZodiacSignSection";
-import Stars from "../components/decorations/Stars";
-import DecorativeElement from "../components/decorations/DecorativeElement";
-import BottomDecorativeElement from "../components/decorations/BottomDecorativeElement";
+import Navbar from "../../components/layout/Navbar";
+import ZodiacSignSection from "../../components/layout/ZodiacSignSection";
+import Stars from "../../components/decorations/Stars";
+import DecorativeElement from "../../components/decorations/DecorativeElement";
+import BottomDecorativeElement from "../../components/decorations/BottomDecorativeElement";
 import { Link } from "react-router-dom";
-import ZodiacRing from "../components/decorations/ZodiacRing";
-import AmbientGlow from "../components/decorations/AmbientGlow";
-import ZodiacCircle from "../src/assets/images/zodiacCircle.png";
-import Dosh from "../src/assets/images/dosh.png";
-import Yog from "../src/assets/images/yog.png";
-import Dasha from "../src/assets/images/dasha.png";
+import ZodiacRing from "../../components/decorations/ZodiacRing";
+import AmbientGlow from "../../components/decorations/AmbientGlow";
+import ZodiacCircle from "../../src/assets/images/ZodiacCircle.png";
+import Dosh from "../../src/assets/images/dosh.png";
+import Yog from "../../src/assets/images/yog.png";
+import Dasha from "../../src/assets/images/dasha.png";
 
 const Home = () => {
   return (
