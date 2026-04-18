@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Stars from "../../components/decorations/Stars";
+import ZodiacRing from "../../components/decorations/ZodiacRing";
 import DecorativeElement from "../../components/decorations/DecorativeElement";
 import BottomDecorativeElement from "../../components/decorations/BottomDecorativeElement";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
@@ -371,6 +372,7 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-800 to-teal-900 text-white relative overflow-hidden">
       <Stars />
+      <ZodiacRing />
       <DecorativeElement />
       <AmbientGlow />
       <Navbar />

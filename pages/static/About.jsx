@@ -3,6 +3,8 @@ import Stars from "../../components/decorations/Stars";
 import DecorativeElement from "../../components/decorations/DecorativeElement";
 import BottomDecorativeElement from "../../components/decorations/BottomDecorativeElement";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
+import ZodiacCircle from "../../src/assets/images/zodiacCircle.png";
+import ZodiacRing from "../../components/decorations/ZodiacRing";
 import { Link } from "react-router-dom";
 
 const values = [
@@ -43,6 +45,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-800 to-teal-900 text-white relative overflow-hidden">
       <Stars />
+      <ZodiacRing/>
       <DecorativeElement />
       <AmbientGlow />
       <Navbar />
