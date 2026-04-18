@@ -335,10 +335,10 @@ const GenerateKundali = () => {
       {/* Same sidebar as dashboard — no active tab since this is a separate page */}
       <UserSidebar
         active=""
-        setActive={() => {}}
+        setActive={(tab) => navigate("/dashboard", { state: { tab } })}
         sideOpen={sideOpen}
         setSideOpen={setSideOpen}
-        onGenerate={() => {}}
+        onGenerate={() => navigate("/generate-kundali")}
         onLogout={() => {
           logout();
           navigate("/");
@@ -386,7 +386,7 @@ const GenerateKundali = () => {
                 Dashboard
               </button>
               <span style={{ color: r(0.15) }}>·</span>
-              <span style={{ color: COLORS.amber.text }}>Generate Kundali</span>
+              <span style={{ color: COLORS.amber.text }} className="font-medium">Generate Kundali</span>
             </div>
           </div>
 

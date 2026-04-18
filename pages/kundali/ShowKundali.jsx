@@ -1691,7 +1691,7 @@ const YogaDetection = () => {
             <div className="hidden lg:flex items-center gap-2 text-[11px] font-light tracking-[0.2em] uppercase">
               <button
                 onClick={() => navigate("/dashboard")}
-                className="transition-opacity hover:opacity-100"
+                className="cursor-pointer transition-opacity hover:opacity-100"
                 style={{ color: r(0.3) }}
               >
                 Dashboard
@@ -1699,13 +1699,13 @@ const YogaDetection = () => {
               <span style={{ color: r(0.15) }}>·</span>
               <button
                 onClick={() => navigate("/generate-kundali")}
-                className="transition-opacity hover:opacity-100"
+                className="cursor-pointer transition-opacity hover:opacity-100"
                 style={{ color: r(0.3) }}
               >
                 Kundali
               </button>
               <span style={{ color: r(0.15) }}>·</span>
-              <span style={{ color: COLORS.amber.text }}>
+              <span style={{ color: COLORS.amber.text }} className="font-medium">
                 {name ? `${name}'s Chart` : "Birth Chart"}
               </span>
             </div>
