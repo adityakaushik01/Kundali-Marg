@@ -279,7 +279,7 @@ const GenerateKundali = () => {
           Authorization: `Bearer ${getToken()}`, // useAuth — not localStorage
         },
         body: JSON.stringify({
-          datetime: combinedDateTime.toISOString(),
+          datetime: combinedDateTime.format("YYYY-MM-DDTHH:mm:ss"),
           latitude: formData.latitude,
           longitude: formData.longitude,
           name: formData.name.trim(),
