@@ -223,10 +223,17 @@ const GenerateKundali = () => {
   };
 
   const handleSelectSuggestion = (suggestion) => {
+
     const p = suggestion.properties;
+    
+    const city = p.city || p.address_line1 || p.name || "";
+    const state = p.state || p.state_code || "";
+    const country = p.country || "";
+    const address = [city, state, country].filter(Boolean).join(", ");
+
     setFormData((prev) => ({
       ...prev,
-      address: `${p.city || p.name}, ${p.state}, ${p.country}`,
+      address,
       latitude: p.lat,
       longitude: p.lon,
       timezone: p.timezone?.name,
