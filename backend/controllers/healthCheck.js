@@ -12,7 +12,7 @@ export const healthCheck = (req, res) => {
         dotenv: 'latest'
       },
       endpoints: {
-        kundli: '/api/kundli (POST)',
+        kundali: '/api/kundali (POST)',
         health: '/api/health (GET)',
         test:   '/api/test (GET)',
         sample: '/api/sample (GET)'

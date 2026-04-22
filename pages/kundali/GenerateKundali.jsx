@@ -279,7 +279,7 @@ const GenerateKundali = () => {
       .millisecond(0);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/kundli`, {
+      const response = await fetch(`${BACKEND_URL}/api/kundali`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

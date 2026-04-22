@@ -3,7 +3,7 @@ const notFound = (req, res) => {
     error: 'Endpoint not found',
     message: `Route ${req.method} ${req.originalUrl} does not exist`,
     available_endpoints: [
-      'POST /api/kundli',
+      'POST /api/kundali',
       'GET  /api/health',
       'GET  /api/test',
       'GET  /api/sample'

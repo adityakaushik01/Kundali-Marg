@@ -3,7 +3,7 @@ export const test = (req, res) => {
     message: 'Server is working correctly',
     usage_example: {
       method: 'POST',
-      url: '/api/kundli',
+      url: '/api/kundali',
       headers: { 'Content-Type': 'application/json' },
       body: {
         datetime: '2000-04-06T07:24:00.000Z',

@@ -89,7 +89,7 @@ const SidebarBase = ({
             <div key={item.id}>
               <button
                 onClick={() => { setActive(item.id); setSideOpen(false); }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left relative"
+                className="cursor-pointer w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left relative"
                 style={isActive
                   ? { background:accent.bg, border:`1px solid ${accent.border}`, color:accent.text }
                   : { border:"1px solid transparent", color:"rgba(255,255,255,0.45)" }

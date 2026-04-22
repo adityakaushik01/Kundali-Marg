@@ -468,7 +468,7 @@ const MyKundalis = ({ navigate, kundalis, loading, onDelete, onView }) => {
         </div>
         <button
           onClick={() => navigate("/generate-kundali")}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium tracking-widest uppercase text-white transition-all hover:opacity-90"
+          className="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium tracking-widest uppercase text-white transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg,#d97706,#b45309)" }}
         >
           <FaPlus />
@@ -507,7 +507,7 @@ const MyKundalis = ({ navigate, kundalis, loading, onDelete, onView }) => {
           </p>
           <button
             onClick={() => navigate("/generate-kundali")}
-            className="px-8 py-3 rounded-full font-medium tracking-widest uppercase text-white text-xs transition-all hover:opacity-90"
+            className="cursor-pointer px-8 py-3 rounded-full font-medium tracking-widest uppercase text-white text-xs transition-all hover:opacity-90"
             style={{ background: "linear-gradient(135deg,#d97706,#b45309)" }}
           >
             Generate Kundali
@@ -887,7 +887,7 @@ const SettingsTab = ({ logout, navigate }) => {
                 onClick={() =>
                   setTog((t) => ({ ...t, [item.key]: !t[item.key] }))
                 }
-                className="w-11 h-6 rounded-full flex-shrink-0 relative transition-all duration-300"
+                className="cursor-pointer w-11 h-6 rounded-full flex-shrink-0 relative transition-all duration-300"
                 style={{
                   background: tog[item.key] ? `${COLORS.amber.text}60` : r(0.1),
                   border: tog[item.key]
@@ -1151,7 +1151,7 @@ const UserDashboard = () => {
         >
           <div className="flex items-center gap-4">
             <button
-              className="lg:hidden opacity-50 hover:opacity-100 transition-opacity"
+              className="cursor-pointer lg:hidden opacity-50 hover:opacity-100 transition-opacity"
               onClick={() => setSideOpen(true)}
             >
               <svg
@@ -1181,7 +1181,7 @@ const UserDashboard = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate("/generate-kundali")}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium tracking-widest uppercase text-white transition-all hover:opacity-90"
+              className="cursor-pointer hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium tracking-widest uppercase text-white transition-all hover:opacity-90"
               style={{ background: "linear-gradient(135deg,#d97706,#b45309)" }}
             >
               <FaPlus />
