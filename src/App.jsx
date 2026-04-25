@@ -11,6 +11,7 @@ import VerifyEmail from "../pages/auth/VerifyEmail";
 import Unauthorized from "../pages/auth/Unauthorized";
 import { AuthProvider } from "../hooks/useAuth";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import AdminDashboard from "../pages/admin/Dashboard";
 
 function App() {
   return (
@@ -27,6 +28,12 @@ function App() {
           <Route path="/generate-kundali" element={<GenerateKundali />} />
           <Route path="/show-kundali" element={<ShowKundali />} />
         </Route>
+
+        <Route element={<ProtectedRoute role="SUPER_ADMIN" />}>
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/show-kundali" element={<ShowKundali />} />
+        </Route>
+
       </Routes>
     </AuthProvider>
   );

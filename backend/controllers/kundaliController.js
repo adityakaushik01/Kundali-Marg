@@ -19,10 +19,14 @@ export const getMyKundalis = async (req, res) => {
 
 export const getKundaliById = async (req, res) => {
   try {
-    const kundali = await Kundali.findOne({
-      _id:     req.params.id,
-      user_id: req.user.user_id,
-    });
+      
+    const query = { _id: req.params.id };
+
+    if (req.user.user_role !== "SUPER_ADMIN") {
+      query.user_id = req.user.user_id;
+    }
+
+    const kundali = await Kundali.findOne(query);
 
     console.log("kundali by id", kundali);
 
@@ -54,5 +58,22 @@ export const deleteKundali = async (req, res) => {
   } catch (error) {
     console.error("deleteKundali error:", error);
     res.status(500).json({ message: "Failed to delete kundali" });
+  }
+};
+
+export const getAllKundalis = async (req, res) => {
+  try {
+    const kundalis = await Kundali.find()
+      .select("_id name birth_details createdAt user_id")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      count: kundalis.length,
+      kundalis,
+    });
+
+  } catch (error) {
+    console.error("getAllKundalis error:", error);
+    res.status(500).json({ message: "Failed to fetch kundalis" });
   }
 };

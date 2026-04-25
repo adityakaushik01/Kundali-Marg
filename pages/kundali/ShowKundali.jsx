@@ -17,6 +17,7 @@ import { GiTimeSynchronization } from "react-icons/gi";
 import { GiYinYang } from "react-icons/gi";
 
 import UserSidebar from "../../components/user/Sidebar";
+import AdminSidebar from "../../components/admin/Sidebar";
 import { glass, COLORS, pageBg } from "../../components/dashboard/theme";
 import useAuth from "../../hooks/useAuth";
 
@@ -209,10 +210,11 @@ const PLANET_ZONE = {
 const r = (o) => `rgba(255,255,255,${o})`;
 
 // ── ShowKundali ───────────────────────────────────────────────────────────────
-const ShowKundali = () => {
+const ShowKundali = ({ role = "user" }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+   const isAdmin = user?.user_role === "SUPER_ADMIN";
 
   const { kundaliData, name, birthDetails } = location.state || {};
   console.log("location.state:", location.state);
@@ -1648,18 +1650,26 @@ const YogaDetection = () => {
       <ZodiacRing />
       <AmbientGlow />
 
-      <UserSidebar
-        active=""
-        setActive={(tab) => navigate("/dashboard", { state: { tab } })}
-        sideOpen={sideOpen}
-        setSideOpen={setSideOpen}
-        onGenerate={() => navigate("/generate-kundali")}
-        onLogout={() => {
-          logout();
-          navigate("/");
-        }}
-        user={sidebarUser}
-      />
+      {isAdmin ? (
+  <AdminSidebar
+    active=""
+    setActive={(tab) => navigate("/admin-dashboard", { state: { tab } })}
+    sideOpen={sideOpen}
+    setSideOpen={setSideOpen}
+    onLogout={() => { logout(); navigate("/"); }}
+    user={sidebarUser}
+  />
+) : (
+  <UserSidebar
+    active=""
+    setActive={(tab) => navigate("/dashboard", { state: { tab } })}
+    sideOpen={sideOpen}
+    setSideOpen={setSideOpen}
+    onGenerate={() => navigate("/generate-kundali")}
+    onLogout={() => { logout(); navigate("/"); }}
+    user={sidebarUser}
+  />
+)}
 
       <div className="lg:pl-64 min-h-screen flex flex-col">
         <header
@@ -1690,8 +1700,8 @@ const YogaDetection = () => {
             </button>
             <div className="hidden lg:flex items-center gap-2 text-[11px] font-light tracking-[0.2em] uppercase">
               <button
-                onClick={() => navigate("/dashboard")}
-                className="transition-opacity hover:opacity-100"
+                onClick={() => navigate(isAdmin ? "/admin-dashboard" : "/dashboard")}
+                className="cursor-pointer transition-opacity hover:opacity-100"
                 style={{ color: r(0.3) }}
               >
                 Dashboard
@@ -1733,7 +1743,9 @@ const YogaDetection = () => {
             </div>
 
             <button
-              onClick={() => navigate("/generate-kundali")}
+
+            onClick={() => navigate(isAdmin ? "/admin-dashboard" : "/generate-kundali")}
+               
               className="cursor-pointer hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-light tracking-widest uppercase transition-all hover:opacity-80"
               style={{
                 background: r(0.05),
@@ -1747,8 +1759,8 @@ const YogaDetection = () => {
 
             <button
               onClick={() =>
-                navigate("/dashboard", { state: { tab: "profile" } })
-              }
+    navigate(isAdmin ? "/admin-dashboard" : "/dashboard", { state: { tab: "profile" } })
+  }
               className="cursor-pointer w-9 h-9 rounded-full flex items-center justify-center text-sm font-light opacity-80 hover:opacity-100 transition-all"
               style={{
                 background: COLORS.amber.bg,
