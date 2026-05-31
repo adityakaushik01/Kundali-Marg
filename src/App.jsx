@@ -15,6 +15,7 @@ import Unauthorized from "../pages/auth/Unauthorized";
 import { AuthProvider } from "../hooks/useAuth";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AdminDashboard from "../pages/admin/Dashboard";
+import UserDetails from "../pages/admin/UserDetails";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route element={<ProtectedRoute role="SUPER_ADMIN" />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/admin/show-kundali" element={<ShowKundali />} />
+          <Route path="/admin/users/:id" element={<UserDetails />} />
         </Route>
 
       </Routes>

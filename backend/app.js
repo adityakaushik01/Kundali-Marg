@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.js";
 import kundaliRoutes from "./routes/kundaliRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -32,6 +33,9 @@ app.use("/api", kundaliRoutes);
 app.use("/api/kundali", kundaliRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/ai", aiRoutes);
+
+// ── Admin Routes ───────────────────────────
+app.use("/api/admin", adminRoutes);
 
 // ── 404 Handler ─────────────────────────────
 app.use(notFound);

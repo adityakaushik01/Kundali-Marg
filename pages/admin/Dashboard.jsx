@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import Stars from "../../components/decorations/Stars";
 import AmbientGlow from "../../components/decorations/AmbientGlow";
@@ -50,20 +50,54 @@ const Skeleton = ({ w = "100%", h = "20px", rounded = "8px" }) => (
 // ─────────────────────────────────────────────────────────────────────────────
 const Overview = ({ stats, statsLoading, recentUsers, setActive }) => {
   const cards = [
-    { label: "Total Users", value: statsLoading ? "…" : String(stats?.total_users ?? 0), sub: "Registered accounts", color: "amber", icon: <FaUsers /> },
-    { label: "Total Kundalis", value: statsLoading ? "…" : String(stats?.total_kundalis ?? 0), sub: "Birth charts generated", color: "teal", icon: <FaStroopwafel /> },
-    { label: "AI Questions", value: statsLoading ? "…" : String(stats?.total_ai_questions ?? 0), sub: "Total AI interactions", color: "violet", icon: <FaRobot /> },
-    { label: "PDFs Generated", value: statsLoading ? "…" : String(stats?.total_pdfs ?? 0), sub: "Reports downloaded", color: "rose", icon: <FaFilePdf /> },
+    {
+      label: "Total Users",
+      value: statsLoading ? "…" : String(stats?.total_users ?? 0),
+      sub: "Registered accounts",
+      color: "amber",
+      icon: <FaUsers />,
+    },
+    {
+      label: "Total Kundalis",
+      value: statsLoading ? "…" : String(stats?.total_kundalis ?? 0),
+      sub: "Birth charts generated",
+      color: "teal",
+      icon: <FaStroopwafel />,
+    },
+    {
+      label: "AI Questions",
+      value: statsLoading ? "…" : String(stats?.total_ai_questions ?? 0),
+      sub: "Total AI interactions",
+      color: "violet",
+      icon: <FaRobot />,
+    },
+    {
+      label: "PDFs Generated",
+      value: statsLoading ? "…" : String(stats?.total_pdfs ?? 0),
+      sub: "Reports downloaded",
+      color: "rose",
+      icon: <FaFilePdf />,
+    },
   ];
 
   return (
     <div className="space-y-8">
       {/* Heading */}
       <div>
-        <p className="text-[10px] tracking-[0.35em] uppercase mb-2" style={{ color: r(0.3) }}>
-          {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
+        <p
+          className="text-[10px] tracking-[0.35em] uppercase mb-2"
+          style={{ color: r(0.3) }}
+        >
+          {new Date().toLocaleDateString("en-IN", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+          })}
         </p>
-        <h1 className="text-3xl md:text-4xl font-light tracking-wider" style={{ color: r(0.92) }}>
+        <h1
+          className="text-3xl md:text-4xl font-light tracking-wider"
+          style={{ color: r(0.92) }}
+        >
           Admin <span style={{ color: COLORS.amber.text }}>Overview</span>
         </h1>
         <p className="text-sm font-light mt-2" style={{ color: r(0.4) }}>
@@ -73,15 +107,30 @@ const Overview = ({ stats, statsLoading, recentUsers, setActive }) => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {cards.map((s, i) => <StatCard key={i} {...s} />)}
+        {cards.map((s, i) => (
+          <StatCard key={i} {...s} />
+        ))}
       </div>
 
       {/* Recent Users */}
       <div className="rounded-2xl overflow-hidden" style={glass()}>
-        <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: `1px solid ${r(0.07)}` }}>
+        <div
+          className="px-6 py-5 flex items-center justify-between"
+          style={{ borderBottom: `1px solid ${r(0.07)}` }}
+        >
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase mb-1" style={{ color: r(0.3) }}>Latest</p>
-            <h3 className="text-base font-light tracking-wider" style={{ color: r(0.88) }}>Recent Users</h3>
+            <p
+              className="text-[10px] tracking-[0.3em] uppercase mb-1"
+              style={{ color: r(0.3) }}
+            >
+              Latest
+            </p>
+            <h3
+              className="text-base font-light tracking-wider"
+              style={{ color: r(0.88) }}
+            >
+              Recent Users
+            </h3>
           </div>
           <button
             onClick={() => setActive("users")}
@@ -105,40 +154,64 @@ const Overview = ({ stats, statsLoading, recentUsers, setActive }) => {
         </div>
         {statsLoading ? (
           <div className="p-6 space-y-3">
-            {[1,2,3].map(i => <Skeleton key={i} h="48px" rounded="12px" />)}
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} h="48px" rounded="12px" />
+            ))}
           </div>
         ) : recentUsers.length === 0 ? (
           <div className="p-10 text-center">
-            <p className="text-sm font-light" style={{ color: r(0.4) }}>No users yet</p>
+            <p className="text-sm font-light" style={{ color: r(0.4) }}>
+              No users yet
+            </p>
           </div>
         ) : (
           recentUsers.slice(0, 5).map((u, i, arr) => (
             <div
               key={u._id}
               className="px-6 py-4 flex items-center gap-4"
-              style={{ borderBottom: i < arr.length - 1 ? `1px solid ${r(0.05)}` : "none" }}
+              style={{
+                borderBottom:
+                  i < arr.length - 1 ? `1px solid ${r(0.05)}` : "none",
+              }}
             >
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-light flex-shrink-0"
-                style={{ background: COLORS.amber.bg, border: `1px solid ${COLORS.amber.border}`, color: COLORS.amber.text }}
+                style={{
+                  background: COLORS.amber.bg,
+                  border: `1px solid ${COLORS.amber.border}`,
+                  color: COLORS.amber.text,
+                }}
               >
                 {u.first_name?.charAt(0)?.toUpperCase() || "?"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-light truncate" style={{ color: r(0.85) }}>
+                <p
+                  className="text-sm font-light truncate"
+                  style={{ color: r(0.85) }}
+                >
                   {u.first_name} {u.last_name}
                 </p>
-                <p className="text-xs font-light mt-0.5 truncate" style={{ color: r(0.35) }}>
+                <p
+                  className="text-xs font-light mt-0.5 truncate"
+                  style={{ color: r(0.35) }}
+                >
                   {u.email_address}
                 </p>
               </div>
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full tracking-wider flex-shrink-0"
-                style={{ background: COLORS.teal.bg, color: COLORS.teal.text, border: `1px solid ${COLORS.teal.border}` }}
+                style={{
+                  background: COLORS.teal.bg,
+                  color: COLORS.teal.text,
+                  border: `1px solid ${COLORS.teal.border}`,
+                }}
               >
                 {u.user_role}
               </span>
-              <p className="text-xs font-light flex-shrink-0" style={{ color: r(0.3) }}>
+              <p
+                className="text-xs font-light flex-shrink-0"
+                style={{ color: r(0.3) }}
+              >
                 {formatDate(u.createdAt)}
               </p>
             </div>
@@ -152,22 +225,32 @@ const Overview = ({ stats, statsLoading, recentUsers, setActive }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // USERS TAB
 // ─────────────────────────────────────────────────────────────────────────────
-const UsersTab = ({ users, loading, onDelete }) => {
+const UsersTab = ({ users, loading, onDelete, onView }) => {
   const [search, setSearch] = useState("");
 
   const filtered = users.filter(
     (u) =>
       u.first_name?.toLowerCase().includes(search.toLowerCase()) ||
       u.last_name?.toLowerCase().includes(search.toLowerCase()) ||
-      u.email_address?.toLowerCase().includes(search.toLowerCase())
+      u.email_address?.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="space-y-5">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <p className="text-[10px] tracking-[0.35em] uppercase mb-1" style={{ color: r(0.3) }}>Manage</p>
-          <h2 className="text-2xl font-light tracking-wider" style={{ color: r(0.9) }}>All Users</h2>
+          <p
+            className="text-[10px] tracking-[0.35em] uppercase mb-1"
+            style={{ color: r(0.3) }}
+          >
+            Manage
+          </p>
+          <h2
+            className="text-2xl font-light tracking-wider"
+            style={{ color: r(0.9) }}
+          >
+            All Users
+          </h2>
         </div>
         {/* Search */}
         <input
@@ -200,34 +283,52 @@ const UsersTab = ({ users, loading, onDelete }) => {
 
         {loading ? (
           <div className="p-6 space-y-3">
-            {[1,2,3,4,5].map(i => <Skeleton key={i} h="52px" rounded="12px" />)}
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} h="52px" rounded="12px" />
+            ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-10 text-center">
-            <p className="text-sm font-light" style={{ color: r(0.4) }}>No users found</p>
+            <p className="text-sm font-light" style={{ color: r(0.4) }}>
+              No users found
+            </p>
           </div>
         ) : (
           filtered.map((u, i, arr) => (
             <div
               key={u._id}
+              onClick={() => onView(u._id)}
               className="px-6 py-4 grid grid-cols-12 gap-4 items-center group hover:bg-white/[0.02] transition-colors"
-              style={{ borderBottom: i < arr.length - 1 ? `1px solid ${r(0.05)}` : "none" }}
+              style={{
+                borderBottom:
+                  i < arr.length - 1 ? `1px solid ${r(0.05)}` : "none",
+              }}
             >
               {/* Name + avatar */}
               <div className="col-span-4 flex items-center gap-3 min-w-0">
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-light flex-shrink-0"
-                  style={{ background: COLORS.amber.bg, border: `1px solid ${COLORS.amber.border}`, color: COLORS.amber.text }}
+                  style={{
+                    background: COLORS.amber.bg,
+                    border: `1px solid ${COLORS.amber.border}`,
+                    color: COLORS.amber.text,
+                  }}
                 >
                   {u.first_name?.charAt(0)?.toUpperCase() || "?"}
                 </div>
-                <p className="text-sm font-light truncate" style={{ color: r(0.85) }}>
+                <p
+                  className="text-sm font-light truncate"
+                  style={{ color: r(0.85) }}
+                >
                   {u.first_name} {u.last_name}
                 </p>
               </div>
 
               {/* Email */}
-              <p className="col-span-3 text-xs font-light truncate hidden md:block" style={{ color: r(0.4) }}>
+              <p
+                className="col-span-3 text-xs font-light truncate hidden md:block"
+                style={{ color: r(0.4) }}
+              >
                 {u.email_address}
               </p>
 
@@ -236,8 +337,14 @@ const UsersTab = ({ users, loading, onDelete }) => {
                 <span
                   className="text-[10px] px-2 py-0.5 rounded-full tracking-wider"
                   style={{
-                    background: u.user_role === "SUPER_ADMIN" ? COLORS.violet.bg : COLORS.teal.bg,
-                    color: u.user_role === "SUPER_ADMIN" ? COLORS.violet.text : COLORS.teal.text,
+                    background:
+                      u.user_role === "SUPER_ADMIN"
+                        ? COLORS.violet.bg
+                        : COLORS.teal.bg,
+                    color:
+                      u.user_role === "SUPER_ADMIN"
+                        ? COLORS.violet.text
+                        : COLORS.teal.text,
                     border: `1px solid ${u.user_role === "SUPER_ADMIN" ? COLORS.violet.border : COLORS.teal.border}`,
                   }}
                 >
@@ -246,7 +353,10 @@ const UsersTab = ({ users, loading, onDelete }) => {
               </div>
 
               {/* Joined */}
-              <p className="col-span-2 text-xs font-light hidden sm:block" style={{ color: r(0.3) }}>
+              <p
+                className="col-span-2 text-xs font-light hidden sm:block"
+                style={{ color: r(0.3) }}
+              >
                 {formatDate(u.createdAt)}
               </p>
 
@@ -258,7 +368,8 @@ const UsersTab = ({ users, loading, onDelete }) => {
                   style={{ color: r(0.3) }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = "rgba(251,113,133,0.9)";
-                    e.currentTarget.style.backgroundColor = "rgba(251,113,133,0.1)";
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(251,113,133,0.1)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.color = r(0.3);
@@ -280,21 +391,31 @@ const UsersTab = ({ users, loading, onDelete }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // KUNDALIS TAB
 // ─────────────────────────────────────────────────────────────────────────────
-const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
+const KundalisTab = ({ kundalis, loading, onDelete, onView }) => {
   const [search, setSearch] = useState("");
 
   const filtered = kundalis.filter(
     (k) =>
       k.name?.toLowerCase().includes(search.toLowerCase()) ||
-      k.birth_details?.place?.toLowerCase().includes(search.toLowerCase())
+      k.birth_details?.place?.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="space-y-5">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <p className="text-[10px] tracking-[0.35em] uppercase mb-1" style={{ color: r(0.3) }}>Manage</p>
-          <h2 className="text-2xl font-light tracking-wider" style={{ color: r(0.9) }}>All Kundalis</h2>
+          <p
+            className="text-[10px] tracking-[0.35em] uppercase mb-1"
+            style={{ color: r(0.3) }}
+          >
+            Manage
+          </p>
+          <h2
+            className="text-2xl font-light tracking-wider"
+            style={{ color: r(0.9) }}
+          >
+            All Kundalis
+          </h2>
         </div>
         <input
           type="text"
@@ -302,35 +423,60 @@ const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or place…"
           className="px-4 py-2 rounded-xl text-sm font-light focus:outline-none focus:border-amber-400 transition-all"
-          style={{ background: r(0.05), border: `1px solid ${r(0.12)}`, color: r(0.85), width: "260px" }}
+          style={{
+            background: r(0.05),
+            border: `1px solid ${r(0.12)}`,
+            color: r(0.85),
+            width: "260px",
+          }}
         />
       </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1,2,3,4].map(i => <Skeleton key={i} h="180px" rounded="16px" />)}
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} h="180px" rounded="16px" />
+          ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center" style={glass()}>
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5"
-            style={{ background: COLORS.amber.bg, border: `1px solid ${COLORS.amber.border}` }}
+            style={{
+              background: COLORS.amber.bg,
+              border: `1px solid ${COLORS.amber.border}`,
+            }}
           >
-            <span style={{ fontSize: "36px", color: COLORS.amber.text }}><FaStroopwafel /></span>
+            <span style={{ fontSize: "36px", color: COLORS.amber.text }}>
+              <FaStroopwafel />
+            </span>
           </div>
-          <h3 className="text-lg font-light tracking-wider mb-2" style={{ color: r(0.8) }}>No Kundalis Found</h3>
-          <p className="text-sm font-light" style={{ color: r(0.4) }}>Try a different search term</p>
+          <h3
+            className="text-lg font-light tracking-wider mb-2"
+            style={{ color: r(0.8) }}
+          >
+            No Kundalis Found
+          </h3>
+          <p className="text-sm font-light" style={{ color: r(0.4) }}>
+            Try a different search term
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map((k, i) => (
             <div
-            onClick={() => onView(k)}
+              onClick={() => onView(k)}
               key={k._id}
               className="cursor-pointer p-5 rounded-2xl transition-all duration-200 group"
               style={glass(i === 0 ? COLORS.amber.border : r(0.1))}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = i === 0 ? "#f59e0b80" : r(0.2))}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = i === 0 ? COLORS.amber.border : r(0.1))}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.borderColor =
+                  i === 0 ? "#f59e0b80" : r(0.2))
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.borderColor =
+                  i === 0 ? COLORS.amber.border : r(0.1))
+              }
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
@@ -338,7 +484,10 @@ const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
                   className="w-11 h-11 rounded-xl flex items-center justify-center text-lg font-light flex-shrink-0"
                   style={{
                     background: i === 0 ? COLORS.amber.bg : r(0.04),
-                    border: i === 0 ? `1px solid ${COLORS.amber.border}` : `1px solid ${r(0.09)}`,
+                    border:
+                      i === 0
+                        ? `1px solid ${COLORS.amber.border}`
+                        : `1px solid ${r(0.09)}`,
                     color: i === 0 ? COLORS.amber.text : r(0.45),
                   }}
                 >
@@ -346,17 +495,29 @@ const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-light truncate" style={{ color: r(0.88) }}>{k.name}</p>
+                    <p
+                      className="text-sm font-light truncate"
+                      style={{ color: r(0.88) }}
+                    >
+                      {k.name}
+                    </p>
                     {i === 0 && (
                       <span
                         className="text-[9px] px-1.5 py-0.5 rounded tracking-wider flex-shrink-0"
-                        style={{ background: COLORS.amber.bg, color: COLORS.amber.text, border: `1px solid ${COLORS.amber.border}` }}
+                        style={{
+                          background: COLORS.amber.bg,
+                          color: COLORS.amber.text,
+                          border: `1px solid ${COLORS.amber.border}`,
+                        }}
                       >
                         LATEST
                       </span>
                     )}
                   </div>
-                  <p className="text-xs font-light mt-0.5" style={{ color: r(0.35) }}>
+                  <p
+                    className="text-xs font-light mt-0.5"
+                    style={{ color: r(0.35) }}
+                  >
                     {k.birth_details?.date} · {k.birth_details?.time}
                   </p>
                 </div>
@@ -367,7 +528,8 @@ const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
                   style={{ color: r(0.3), backgroundColor: "transparent" }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = "rgba(251,113,133,0.9)";
-                    e.currentTarget.style.backgroundColor = "rgba(251,113,133,0.1)";
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(251,113,133,0.1)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.color = r(0.3);
@@ -380,7 +542,13 @@ const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
               </div>
 
               {/* Divider */}
-              <div style={{ height: "1px", background: r(0.07), marginBottom: "14px" }} />
+              <div
+                style={{
+                  height: "1px",
+                  background: r(0.07),
+                  marginBottom: "14px",
+                }}
+              />
 
               {/* Details */}
               <div className="grid grid-cols-2 gap-2">
@@ -388,9 +556,26 @@ const KundalisTab = ({ kundalis, loading, onDelete, onView  }) => {
                   ["Place", k.birth_details?.place || "—"],
                   ["Saved on", formatDate(k.createdAt)],
                 ].map(([l, v]) => (
-                  <div key={l} className="p-2.5 rounded-xl" style={{ background: r(0.04), border: `1px solid ${r(0.07)}` }}>
-                    <p className="text-[10px] font-light mb-0.5" style={{ color: r(0.3) }}>{l}</p>
-                    <p className="text-xs font-light truncate" style={{ color: r(0.72) }}>{v}</p>
+                  <div
+                    key={l}
+                    className="p-2.5 rounded-xl"
+                    style={{
+                      background: r(0.04),
+                      border: `1px solid ${r(0.07)}`,
+                    }}
+                  >
+                    <p
+                      className="text-[10px] font-light mb-0.5"
+                      style={{ color: r(0.3) }}
+                    >
+                      {l}
+                    </p>
+                    <p
+                      className="text-xs font-light truncate"
+                      style={{ color: r(0.72) }}
+                    >
+                      {v}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -409,13 +594,14 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, logout, getToken } = useAuth();
 
+  const location = useLocation();
   const [active, setActive] = useState(location.state?.tab || "overview");
 
   useEffect(() => {
-  if (location.state?.tab) {
-    window.history.replaceState({}, "");
-  }
-}, []);
+    if (location.state?.tab) {
+      window.history.replaceState({}, "");
+    }
+  }, []);
   const [sideOpen, setSideOpen] = useState(false);
 
   const [stats, setStats] = useState(null);
@@ -529,29 +715,35 @@ const AdminDashboard = () => {
   };
 
   const handleViewKundali = async (k) => {
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/kundali/${k._id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    if (!res.ok) throw new Error();
-    const full = await res.json();
-    navigate("/admin/show-kundali", {
-      state: {
-        kundaliData: { ...full.kundali_data, _id: full._id, dasha_timeline: full.dasha_timeline },
-        name: full.name,
-        birthDetails: full.birth_details,
-      },
-    });
-  } catch {
-    toast.error("Failed to load kundali. Please try again.");
-  }
-};
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/kundali/${k._id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) throw new Error();
+      const full = await res.json();
+      navigate("/admin/show-kundali", {
+        state: {
+          kundaliData: {
+            ...full.kundali_data,
+            _id: full._id,
+            dasha_timeline: full.dasha_timeline,
+          },
+          name: full.name,
+          birthDetails: full.birth_details,
+        },
+      });
+    } catch {
+      toast.error("Failed to load kundali. Please try again.");
+    }
+  };
 
   const sidebarUser = {
-  name: user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Admin" : "Admin",
-  initial: user?.first_name?.charAt(0)?.toUpperCase() || "A",
-  line1: user?.email || "",   // ← add this
-};
+    name: user
+      ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Admin"
+      : "Admin",
+    initial: user?.first_name?.charAt(0)?.toUpperCase() || "A",
+    line1: user?.email || "", // ← add this
+  };
 
   const NAV_LABEL = {
     overview: "Overview",
@@ -576,6 +768,7 @@ const AdminDashboard = () => {
             users={users}
             loading={usersLoading}
             onDelete={handleDeleteUser}
+            onView={(id) => navigate(`/admin/users/${id}`)}
           />
         );
       case "kundalis":
@@ -593,7 +786,10 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden" style={pageBg}>
+    <div
+      className="min-h-screen text-white relative overflow-hidden"
+      style={pageBg}
+    >
       <Stars />
       <DecorativeElement />
       <ZodiacRing />
@@ -604,7 +800,10 @@ const AdminDashboard = () => {
         setActive={setActive}
         sideOpen={sideOpen}
         setSideOpen={setSideOpen}
-        onLogout={() => { logout(); navigate("/"); }}
+        onLogout={() => {
+          logout();
+          navigate("/");
+        }}
         user={sidebarUser}
       />
 
@@ -624,14 +823,25 @@ const AdminDashboard = () => {
               className="cursor-pointer lg:hidden opacity-50 hover:opacity-100 transition-opacity"
               onClick={() => setSideOpen(true)}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              >
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div className="hidden lg:flex items-center gap-2 text-[11px] font-light tracking-[0.2em] uppercase">
               <span style={{ color: r(0.35) }}>Admin</span>
               <span style={{ color: r(0.15) }}>·</span>
-              <span style={{ color: COLORS.amber.text }} className="font-medium">
+              <span
+                style={{ color: COLORS.amber.text }}
+                className="font-medium"
+              >
                 {NAV_LABEL[active]}
               </span>
             </div>
@@ -640,13 +850,21 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-3">
             <span
               className="text-[10px] px-3 py-1 rounded-full tracking-widest uppercase"
-              style={{ background: COLORS.violet.bg, color: COLORS.violet.text, border: `1px solid ${COLORS.violet.border}` }}
+              style={{
+                background: COLORS.violet.bg,
+                color: COLORS.violet.text,
+                border: `1px solid ${COLORS.violet.border}`,
+              }}
             >
               Super Admin
             </span>
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-light"
-              style={{ background: COLORS.amber.bg, border: `1px solid ${COLORS.amber.border}`, color: COLORS.amber.text }}
+              style={{
+                background: COLORS.amber.bg,
+                border: `1px solid ${COLORS.amber.border}`,
+                color: COLORS.amber.text,
+              }}
             >
               {sidebarUser.initial}
             </div>
@@ -658,8 +876,14 @@ const AdminDashboard = () => {
           {renderContent()}
         </main>
 
-        <footer className="px-7 py-4" style={{ borderTop: `1px solid ${r(0.07)}` }}>
-          <p className="text-[10px] font-light tracking-[0.3em] uppercase text-center" style={{ color: r(0.15) }}>
+        <footer
+          className="px-7 py-4"
+          style={{ borderTop: `1px solid ${r(0.07)}` }}
+        >
+          <p
+            className="text-[10px] font-light tracking-[0.3em] uppercase text-center"
+            style={{ color: r(0.15) }}
+          >
             Nakshatra AI · Admin Panel · Restricted Access
           </p>
         </footer>
