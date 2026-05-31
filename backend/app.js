@@ -10,6 +10,7 @@ import kundaliRoutes from "./routes/kundaliRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import adminCreationRoute from "./routes/superAdmin.js";
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/ai", aiRoutes);
 
 // ── Admin Routes ───────────────────────────
 app.use("/api/admin", adminRoutes);
+app.use("/api", adminCreationRoute);
 
 // ── 404 Handler ─────────────────────────────
 app.use(notFound);
