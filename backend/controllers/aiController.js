@@ -128,7 +128,8 @@ export const askAI = async (req, res) => {
       return res.status(403).json({ message: "Free AI message limit reached. Please upgrade to continue." });
     }
 
-    const kundaliDoc = await Kundali.findOne({ _id: kundali_id, user_id });
+    const isAdmin = req.user.user_role === "SUPER_ADMIN";
+    const kundaliDoc = isAdmin ? await Kundali.findById(kundali_id) : await Kundali.findOne({ _id: kundali_id, user_id });
     if (!kundaliDoc) {
       return res.status(404).json({ message: "Kundali not found" });
     }
@@ -192,7 +193,9 @@ export const getChatHistory = async (req, res) => {
     const { kundali_id } = req.params;
     const user_id = req.user.user_id;
 
-    const chat = await aiChat.findOne({ user_id, kundali_id });
+    const isAdmin = req.user.user_role === "SUPER_ADMIN";
+    const query = isAdmin ? { kundali_id } : { user_id, kundali_id };
+    const chat = await aiChat.findOne(query);
     if (!chat) {
       return res.json({ messages: [] });
     }
