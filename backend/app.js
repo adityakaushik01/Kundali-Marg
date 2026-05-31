@@ -24,7 +24,7 @@ app.use(requestLogger);
 
 // ── Rate Limiters (BEFORE ROUTES) ───────────
 app.use("/api/auth", rateLimiter);
-app.use("/api/kundli", rateLimiter);
+app.use("/api/kundali", rateLimiter);
 
 // ── Routes ─────────────────────────────────
 app.use("/api/auth", authRoutes);

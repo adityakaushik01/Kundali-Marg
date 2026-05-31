@@ -88,6 +88,14 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    if (!user.is_active) {
+      logger.warn("Login blocked - inactive user", { email_address });
+
+      return res.status(403).json({
+        message: "Your account is deactivated. Please contact support."
+      });
+    }
+
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {

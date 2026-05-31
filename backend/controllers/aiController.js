@@ -155,9 +155,13 @@ export const askAI = async (req, res) => {
         return i >= firstUserIdx;
       });
 
+      console.log("GEMINI_API_KEY present:", !!process.env.GEMINI_API_KEY);
+console.log("Model being used: gemini-3.1-flash-lite-preview");
+console.log("Attempting Gemini call...");
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      // model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite-preview",
       systemInstruction: systemPrompt,
     });
 

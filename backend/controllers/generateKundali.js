@@ -1,7 +1,7 @@
 import { calculateAccurateKundali } from "../kundaliCalculator.js";
 import User from "../models/User.js";
 import Kundali from "../models/Kundali.js";
-import { FREE_KUNDALI_LIMIT } from "../config/limits.js";
+import { FREE_KUNDALI_LIMIT, UNLIMITED_KUNDALI_LIMIT } from "../config/limits.js";
 import { calculateDashaBalance, generateMahadashaTimeline, DASHA_ORDER, DASHA_YEARS } from "../utils/dashaCalculation.js";
 
 export const generateKundali = async (req, res) => {
@@ -11,13 +11,23 @@ export const generateKundali = async (req, res) => {
     const user = await User.findById(req.user.user_id);
     console.log("user found in generateKundali", user);
 
-    if (user.kundali_created_count >= FREE_KUNDALI_LIMIT) {
-      return res.status(403).json({
-        message: "Free kundali limit reached. Please buy credits."
-      });
-    }
+    const kundaliLimit = user.is_premium ? UNLIMITED_KUNDALI_LIMIT : FREE_KUNDALI_LIMIT;
+
+if (kundaliLimit !== UNLIMITED_KUNDALI_LIMIT && user.kundali_created_count >= kundaliLimit) {
+  return res.status(403).json({
+    message: "Free kundali limit reached. Please upgrade to continue."
+  });
+}
 
     const { datetime, latitude, longitude, name, timezone, timezoneOffset } = req.body;
+
+    console.log("=== KUNDALI REQUEST ===");
+    console.log("datetime received:", datetime);
+    console.log("timezone received:", timezone);
+    console.log("timezoneOffset received:", timezoneOffset);
+    console.log("birthDate parsed:", new Date(datetime).toISOString());
+    console.log("birthDateUTC calculated:", new Date(new Date(datetime).getTime() - (timezoneOffset || 0) * 1000).toISOString());
+    console.log("======================");
 
     console.log('Kundali Request Received:', {
       datetime, latitude, longitude,
@@ -69,7 +79,8 @@ export const generateKundali = async (req, res) => {
       });
     }
 
-    const birthDate = new Date(datetime);
+    const birthDate = new Date(datetime + "Z");
+    const birthDateUTC = new Date(birthDate.getTime() - (timezoneOffset || 0) * 1000);
     if (isNaN(birthDate.getTime())) {
       return res.status(400).json({
         error: 'Invalid datetime',
@@ -94,7 +105,7 @@ export const generateKundali = async (req, res) => {
     console.log('Validation passed, calculating kundali...');
 
     const kundaliData = await calculateAccurateKundali({
-      datetime: birthDate,
+      datetime: birthDateUTC,
       latitude: lat,
       longitude: lng,
       name: (name || '').trim() || 'User'
@@ -107,7 +118,7 @@ const moonNakshatraIndex = Math.floor(moon.absoluteDegree / 13.3333333333);
 const startLord = DASHA_ORDER[moonNakshatraIndex % 9];
 const degreeInNakshatra = moon.absoluteDegree % 13.3333333333;
 const balanceYears = calculateDashaBalance(degreeInNakshatra, DASHA_YEARS[startLord]);
-const dashaTimeline = generateMahadashaTimeline(birthDate, startLord, balanceYears);
+const dashaTimeline = generateMahadashaTimeline(birthDateUTC, startLord, balanceYears);
 
     kundaliData.request_info = {
       processed_at: new Date().toISOString(),

@@ -9,7 +9,7 @@ import { authorizeRoles } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-router.post("/kundli", authenticateUser, generateKundali);
+router.post("/kundali", authenticateUser, generateKundali);
 router.get("/health", healthCheck);
 router.get("/test", test);
 router.get("/sample", sampleKundali);

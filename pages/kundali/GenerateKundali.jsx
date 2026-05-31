@@ -223,10 +223,17 @@ const GenerateKundali = () => {
   };
 
   const handleSelectSuggestion = (suggestion) => {
+
     const p = suggestion.properties;
+    
+    const city = p.city || p.address_line1 || p.name || "";
+    const state = p.state || p.state_code || "";
+    const country = p.country || "";
+    const address = [city, state, country].filter(Boolean).join(", ");
+
     setFormData((prev) => ({
       ...prev,
-      address: `${p.city || p.name}, ${p.state}, ${p.country}`,
+      address,
       latitude: p.lat,
       longitude: p.lon,
       timezone: p.timezone?.name,
@@ -272,14 +279,14 @@ const GenerateKundali = () => {
       .millisecond(0);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/kundli`, {
+      const response = await fetch(`${BACKEND_URL}/api/kundali`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`, // useAuth — not localStorage
         },
         body: JSON.stringify({
-          datetime: combinedDateTime.toISOString(),
+          datetime: combinedDateTime.format("YYYY-MM-DDTHH:mm:ss"),
           latitude: formData.latitude,
           longitude: formData.longitude,
           name: formData.name.trim(),
@@ -335,10 +342,10 @@ const GenerateKundali = () => {
       {/* Same sidebar as dashboard — no active tab since this is a separate page */}
       <UserSidebar
         active=""
-        setActive={() => {}}
+        setActive={(tab) => navigate("/dashboard", { state: { tab } })}
         sideOpen={sideOpen}
         setSideOpen={setSideOpen}
-        onGenerate={() => {}}
+        onGenerate={() => navigate("/generate-kundali")}
         onLogout={() => {
           logout();
           navigate("/");
@@ -386,7 +393,7 @@ const GenerateKundali = () => {
                 Dashboard
               </button>
               <span style={{ color: r(0.15) }}>·</span>
-              <span style={{ color: COLORS.amber.text }}>Generate Kundali</span>
+              <span style={{ color: COLORS.amber.text }} className="font-medium">Generate Kundali</span>
             </div>
           </div>
 
