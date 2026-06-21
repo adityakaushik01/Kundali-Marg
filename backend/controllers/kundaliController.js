@@ -29,6 +29,7 @@ export const getKundaliById = async (req, res) => {
     const kundali = await Kundali.findOne(query);
 
     console.log("kundali by id", kundali);
+    console.log("kundali by id stringify", JSON.stringify(kundali, null, 2));
 
     if (!kundali) {
       return res.status(404).json({ message: "Kundali not found" });
