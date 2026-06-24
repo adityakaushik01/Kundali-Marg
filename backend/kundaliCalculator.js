@@ -28,19 +28,19 @@ const SIGN_LORDS = [
 
 const HOUSE_NAMES = {
   1: 'Lagna', 2: 'Dhana', 3: 'Sahaja', 4: 'Sukha',
-  5: 'Putra', 6: 'Ripu',  7: 'Kalatra', 8: 'Ayur',
+  5: 'Putra', 6: 'Ripu', 7: 'Kalatra', 8: 'Ayur',
   9: 'Bhagya', 10: 'Karma', 11: 'Labha', 12: 'Vyaya'
 };
 
 const PLANETS = {
-  Sun:     swisseph.SE_SUN,
-  Moon:    swisseph.SE_MOON,
-  Mars:    swisseph.SE_MARS,
+  Sun: swisseph.SE_SUN,
+  Moon: swisseph.SE_MOON,
+  Mars: swisseph.SE_MARS,
   Mercury: swisseph.SE_MERCURY,
   Jupiter: swisseph.SE_JUPITER,
-  Venus:   swisseph.SE_VENUS,
-  Saturn:  swisseph.SE_SATURN,
-  Rahu:    swisseph.SE_TRUE_NODE,
+  Venus: swisseph.SE_VENUS,
+  Saturn: swisseph.SE_SATURN,
+  Rahu: swisseph.SE_TRUE_NODE,
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -78,10 +78,10 @@ const getNakshatraInfo = (siderealLon) => {
 // ── Julian Date ───────────────────────────────────────────────────────────────
 
 const getJulianDate = (date) => {
-  const year  = date.getUTCFullYear();
+  const year = date.getUTCFullYear();
   const month = date.getUTCMonth() + 1;
-  const day   = date.getUTCDate();
-  const hour  = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
+  const day = date.getUTCDate();
+  const hour = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
   return swisseph.swe_julday(year, month, day, hour, swisseph.SE_GREG_CAL);
 };
 
@@ -102,12 +102,12 @@ const calculatePlanet = (jd, planetId, ayanamsa) => {
       // console.log('RAW swisseph planet result:', JSON.stringify(result, null, 2));
       const tropicalLon = result.longitude;
       const siderealLon = norm360(tropicalLon - ayanamsa);
-      const speed       = result.longitudeSpeed;
+      const speed = result.longitudeSpeed;
       resolve({
         tropicalLongitude: parseFloat(tropicalLon.toFixed(4)),
         siderealLongitude: parseFloat(siderealLon.toFixed(4)),
-        speed:             parseFloat(speed.toFixed(6)),
-        retrograde:        speed < 0,
+        speed: parseFloat(speed.toFixed(6)),
+        retrograde: speed < 0,
         ...getSignInfo(siderealLon),
         ...getNakshatraInfo(siderealLon),
       });
@@ -129,12 +129,12 @@ const calculateLagna = (jd, latitude, longitude, ayanamsa) => {
     swisseph.swe_houses(jd, latitude, longitude, 'P', (result) => {
 
       if (result.error) { reject(new Error(result.error)); return; }
-// console.log('RAW swisseph houses result:', JSON.stringify(result, null, 2));
+      // console.log('RAW swisseph houses result:', JSON.stringify(result, null, 2));
       // Ascendant is the same regardless of house system ('P' Placidus or 'W' Whole Sign)
       const tropicalAsc = result.ascendant;
       const siderealAsc = norm360(tropicalAsc - ayanamsa);
 
-      const signInfo      = getSignInfo(siderealAsc);
+      const signInfo = getSignInfo(siderealAsc);
       const nakshatraInfo = getNakshatraInfo(siderealAsc);
 
       // Build house cusps from result.house array
@@ -148,17 +148,23 @@ const calculateLagna = (jd, latitude, longitude, ayanamsa) => {
           house: i,
           tropicalCusp: parseFloat(tropicalCusp.toFixed(4)),
           siderealCusp: parseFloat(siderealCusp.toFixed(4)),
-          sign:      cuspSignInfo.sign,
+          sign: cuspSignInfo.sign,
           signIndex: cuspSignInfo.signIndex,
-          lord:      cuspSignInfo.lord,
+          lord: cuspSignInfo.lord,
         });
       }
 
       resolve({
         tropicalLongitude: parseFloat(tropicalAsc.toFixed(4)),
         siderealLongitude: parseFloat(siderealAsc.toFixed(4)),
-        ...signInfo,
-        ...nakshatraInfo,
+        sign: signInfo.sign,
+        signIndex: signInfo.signIndex,
+        degree: signInfo.degree,
+        absoluteDegree: signInfo.absoluteDegree,
+        signLord: signInfo.lord,
+        nakshatra: nakshatraInfo.nakshatra,
+        pada: nakshatraInfo.pada,
+        nakshatraLord: nakshatraInfo.lord,
         houseCusps,
       });
     });
@@ -172,10 +178,10 @@ const assignPlanetsToHouses = (planets, lagnaSignIndex) => {
   for (let i = 1; i <= 12; i++) {
     houseMap[i] = {
       house: i,
-      sign:      ZODIAC_SIGNS[(lagnaSignIndex + i - 1) % 12],
+      sign: ZODIAC_SIGNS[(lagnaSignIndex + i - 1) % 12],
       signIndex: (lagnaSignIndex + i - 1) % 12,
-      lord:      SIGN_LORDS[(lagnaSignIndex + i - 1) % 12],
-      planets:   [],
+      lord: SIGN_LORDS[(lagnaSignIndex + i - 1) % 12],
+      planets: [],
     };
   }
   Object.entries(planets).forEach(([name, data]) => {
@@ -191,7 +197,7 @@ const assignPlanetsToHouses = (planets, lagnaSignIndex) => {
 const buildRasiChart = (houseMap) =>
   Object.values(houseMap).map(({ house, sign, signIndex, lord, planets }) => ({
     house, sign, signIndex, lord,
-    planet:  planets.join(', '),
+    planet: planets.join(', '),
     planets,
   }));
 
@@ -253,64 +259,66 @@ export const calculateAccurateKundali = async ({
     const rasiChart = buildRasiChart(houseMap);
 
     const planetsArray = Object.values(planetData).map(p => ({
-      name:          p.name,
-      sign:          p.sign,
-      signIndex:     p.signIndex,
-      house:         p.house || 1,
-      degree:        parseFloat((p.degree || 0).toFixed(2)),
+      name: p.name,
+      sign: p.sign,
+      signIndex: p.signIndex,
+      house: p.house || 1,
+      degree: parseFloat((p.degree || 0).toFixed(2)),
       absoluteDegree: parseFloat((p.siderealLongitude || 0).toFixed(2)),
-      nakshatra:     p.nakshatra,
+      nakshatra: p.nakshatra,
       nakshatraPada: p.pada,
       nakshatraLord: p.lord,
-      signLord:      p.signLord || SIGN_LORDS[p.signIndex] || '',
-      retrograde:    p.retrograde || false,
-      speed:         p.speed || 0,
+      signLord: p.signLord || SIGN_LORDS[p.signIndex] || '',
+      retrograde: p.retrograde || false,
+      speed: p.speed || 0,
     }));
 
-    const finalOutput = { status: 'success', data: {
+    const finalOutput = {
+      status: 'success', data: {
         birth_details: {
           name,
-          datetime_utc:   datetime.toISOString(),
-          latitude:       parseFloat(latitude.toFixed(4)),
-          longitude:      parseFloat(longitude.toFixed(4)),
-          julianDay:      parseFloat(jd.toFixed(4)),
-          ayanamsa:       parseFloat(ayanamsa.toFixed(4)),
-          ayanamsaName:   'Lahiri',
+          datetime_utc: datetime.toISOString(),
+          latitude: parseFloat(latitude.toFixed(4)),
+          longitude: parseFloat(longitude.toFixed(4)),
+          julianDay: parseFloat(jd.toFixed(4)),
+          ayanamsa: parseFloat(ayanamsa.toFixed(4)),
+          ayanamsaName: 'Lahiri',
           timezone,
           timezoneOffset,
         },
         lagna: {
-          sign:          lagnaData.sign,
-          signIndex:     lagnaData.signIndex,
-          degree:        parseFloat((lagnaData.degree || 0).toFixed(2)),
-          nakshatra:     lagnaData.nakshatra,
+          sign: lagnaData.sign,
+          signIndex: lagnaData.signIndex,
+          degree: parseFloat((lagnaData.degree || 0).toFixed(2)),
+          nakshatra: lagnaData.nakshatra,
           nakshatraPada: lagnaData.pada,
-          lord:          lagnaData.lord,
+          nakshatraLord: lagnaData.lord,
+          lord: lagnaData.signLord,
         },
         planets: planetsArray,
         chart: {
           rasi: rasiChart,
           houses: Object.values(houseMap).map(h => ({
-            house:     h.house,
-            name:      HOUSE_NAMES[h.house],
-            sign:      h.sign,
+            house: h.house,
+            name: HOUSE_NAMES[h.house],
+            sign: h.sign,
             signIndex: h.signIndex,
-            lord:      h.lord,
-            planets:   h.planets,
-            planet:    h.planets.join(', '),
+            lord: h.lord,
+            planets: h.planets,
+            planet: h.planets.join(', '),
           })),
         },
         meta: {
           calculatedAt: new Date().toISOString(),
-          houseSystem:  'Whole Sign',
-          ayanamsa:     'Lahiri',
-          ephemeris:    'Swiss Ephemeris',
+          houseSystem: 'Whole Sign',
+          ayanamsa: 'Lahiri',
+          ephemeris: 'Swiss Ephemeris',
         },
       },
     };
 
-// console.log('FINAL KUNDALI OUTPUT:', JSON.stringify(finalOutput, null, 2));
-return finalOutput;
+    // console.log('FINAL KUNDALI OUTPUT:', JSON.stringify(finalOutput, null, 2));
+    return finalOutput;
 
   } catch (error) {
     console.error('Kundali calculation error:', error);

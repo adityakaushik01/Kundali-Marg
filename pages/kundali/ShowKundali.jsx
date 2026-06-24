@@ -173,9 +173,9 @@ const PLANET_ZONE = {
   5:  { xMin: 20,  xMax: 95,  yMin: 305, yMax: 375 },
   6:  { xMin: 80,  xMax: 160, yMin: 360, yMax: 440 },
   7:  { xMin: 195, xMax: 285, yMin: 310, yMax: 385 },
-  8:  { xMin: 310, xMax: 390, yMin: 360, yMax: 440 },
+  8:  { xMin: 310, xMax: 390, yMin: 400, yMax: 440 },
   9:  { xMin: 385, xMax: 460, yMin: 305, yMax: 375 },
-  10: { xMin: 285, xMax: 355, yMin: 205, yMax: 275 },
+  10: { xMin: 272, xMax: 368, yMin: 192, yMax: 282 },
   11: { xMin: 385, xMax: 460, yMin: 90,  yMax: 165 },
   12: { xMin: 310, xMax: 390, yMin: 35,  yMax: 110 },
 };
@@ -762,6 +762,7 @@ const ShowKundali = ({ role = "user" }) => {
 
   // ── DashaTimeline ─────────────────────────────────────────────────────────
   const DashaTimeline = () => {
+    const [expandedAntar, setExpandedAntar] = useState(null);
     const timeline = kundaliData?.dasha_timeline || [];
     const now = new Date();
 
@@ -795,7 +796,13 @@ const ShowKundali = ({ role = "user" }) => {
       timeline.findIndex(d => now >= new Date(d.start) && now <= new Date(d.end))
     );
 
-    const fmt = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    const fmt = (d) => {
+  const date  = new Date(d);
+  const day   = String(date.getDate()).padStart(2, "0");
+  const month = date.toLocaleString("en-IN", { month: "short" });
+  const year  = date.getFullYear();
+  return `${day} ${month} ${year}`;
+};
     const getProgress = (start, end) => {
       const total = new Date(end) - new Date(start);
       const elapsed = now - new Date(start);
@@ -899,33 +906,90 @@ const ShowKundali = ({ role = "user" }) => {
                   {isExpanded && (
                     <div className="ml-4 mt-1 space-y-1 pl-3" style={{ borderLeft: `1px solid ${r(0.08)}` }}>
                       {antardashas.map((antar, ai) => {
-                        const isCurrentAntar = now >= new Date(antar.start) && now <= new Date(antar.end);
-                        const isAntarPast    = now > new Date(antar.end);
-                        const antarColor     = planetColors[antar.lord] || COLORS.amber.text;
-                        const antarLabel     = lang === "hi" ? (L.full[antar.lord] ?? antar.lord) : antar.lord;
-                        return (
-                          <div key={ai} className="p-3 rounded-lg"
-                            style={{ background: isCurrentAntar ? `${antarColor}10` : r(0.02), border: `1px solid ${isCurrentAntar ? antarColor + "30" : r(0.05)}` }}>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: isAntarPast ? r(0.15) : antarColor }} />
-                                <span className="text-xs font-light" style={{ color: isAntarPast ? r(0.3) : r(0.75) }}>
-                                  {lordLabel}-{antarLabel}
-                                </span>
-                                {isCurrentAntar && (
-                                  <span className="text-[9px] px-1.5 py-0.5 rounded-full"
-                                    style={{ background: `${antarColor}20`, color: antarColor }}>
-                                    {lang === "hi" ? "अभी" : "Now"}
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-[10px] font-light" style={{ color: r(0.25) }}>
-                                {fmt(antar.start)} — {fmt(antar.end)}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
+  const isCurrentAntar = now >= new Date(antar.start) && now <= new Date(antar.end);
+  const isAntarPast    = now > new Date(antar.end);
+  const antarColor     = planetColors[antar.lord] || COLORS.amber.text;
+  const antarLabel     = lang === "hi" ? (L.full[antar.lord] ?? antar.lord) : antar.lord;
+  const antarKey       = `${idx}-${ai}`;
+  const isAntarExpanded = expandedAntar === antarKey;
+
+  // Generate Pratyantardashas
+  const pratyantardashas = isAntarExpanded ? (() => {
+    const antarTotalDays = (new Date(antar.end) - new Date(antar.start));
+    const antarTotalYears = antarTotalDays / (365.25 * 24 * 60 * 60 * 1000);
+    const startIdx = DASHA_ORDER.indexOf(antar.lord);
+    let currentPD = new Date(antar.start);
+    return DASHA_ORDER.map((_, pi) => {
+      const pdLord = DASHA_ORDER[(startIdx + pi) % DASHA_ORDER.length];
+      const pdYears = (DASHA_YEARS[pdLord] * antarTotalYears * DASHA_YEARS[dasha.lord]) / (120 * 120 / 12);
+      // Simplified: proportional split
+      const pdDays = (DASHA_YEARS[pdLord] / 120) * antarTotalDays;
+      const pdEnd = new Date(currentPD.getTime() + pdDays);
+      const entry = { lord: pdLord, start: new Date(currentPD), end: new Date(pdEnd) };
+      currentPD = pdEnd;
+      return entry;
+    });
+  })() : [];
+
+  return (
+    <div key={ai}>
+      <button
+        onClick={() => setExpandedAntar(isAntarExpanded ? null : antarKey)}
+        className="w-full text-left p-3 rounded-lg transition-all"
+        style={{ background: isCurrentAntar ? `${antarColor}10` : r(0.02), border: `1px solid ${isCurrentAntar ? antarColor + "30" : r(0.05)}` }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: isAntarPast ? r(0.15) : antarColor }} />
+            <span className="text-xs font-light" style={{ color: isAntarPast ? r(0.3) : r(0.75) }}>
+              {lordLabel}-{antarLabel}
+            </span>
+            {isCurrentAntar && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${antarColor}20`, color: antarColor }}>
+                {lang === "hi" ? "अभी" : "Now"}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-light" style={{ color: r(0.25) }}>
+              {fmt(antar.start)} — {fmt(antar.end)}
+            </span>
+            <span style={{ color: r(0.2), fontSize: "9px" }}>{isAntarExpanded ? "▲" : "▼"}</span>
+          </div>
+        </div>
+      </button>
+
+      {/* Pratyantardasha */}
+      {isAntarExpanded && (
+        <div className="ml-4 mt-1 space-y-1 pl-3" style={{ borderLeft: `1px solid ${r(0.05)}` }}>
+          {pratyantardashas.map((pd, pi) => {
+            const isPDCurrent = now >= new Date(pd.start) && now <= new Date(pd.end);
+            const pdColor = planetColors[pd.lord] || COLORS.amber.text;
+            const pdLabel = lang === "hi" ? (L.full[pd.lord] ?? pd.lord) : pd.lord;
+            return (
+              <div key={pi} className="p-2 rounded-lg"
+                style={{ background: isPDCurrent ? `${pdColor}10` : r(0.01), border: `1px solid ${isPDCurrent ? pdColor + "25" : r(0.04)}` }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full" style={{ background: pdColor, opacity: 0.7 }} />
+                    <span className="text-[10px] font-light" style={{ color: r(0.55) }}>
+                      {lordLabel}-{antarLabel}-{pdLabel}
+                    </span>
+                    {isPDCurrent && (
+                      <span className="text-[8px] px-1 py-0.5 rounded-full" style={{ background: `${pdColor}20`, color: pdColor }}>●</span>
+                    )}
+                  </div>
+                  <span className="text-[9px]" style={{ color: r(0.2) }}>
+                    {fmt(pd.start)} — {fmt(pd.end)}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+})}
                     </div>
                   )}
                 </div>
@@ -1254,7 +1318,7 @@ const ShowKundali = ({ role = "user" }) => {
             <div className="flex flex-wrap gap-2">
               {CHART_CONFIGS.map(c => (
                 <button key={c.key} onClick={() => setSelectedDiv(c.key)}
-                  className="px-3 py-1.5 rounded-full text-[11px] font-light tracking-wide transition-all duration-200"
+                  className="cursor-pointer px-3 py-1.5 rounded-full text-[11px] font-medium tracking-wide transition-all duration-200"
                   style={selectedDiv === c.key
                     ? { background: c.accentColor, color: "#000", boxShadow: `0 2px 12px ${c.accentColor}50` }
                     : { background: r(0.04), border: `1px solid ${c.accentColor}40`, color: r(0.5) }
@@ -1417,7 +1481,7 @@ const ShowKundali = ({ role = "user" }) => {
               const hm = getHouseMapForDiv(c.div);
               return (
                 <button key={c.key} onClick={() => setSelectedDiv(c.key)}
-                  className="p-2 rounded-xl transition-all duration-200 text-left"
+                  className="cursor-pointer p-2 rounded-xl transition-all duration-200 text-left"
                   style={{
                     background: selectedDiv === c.key ? `${c.accentColor}12` : r(0.02),
                     border: `1px solid ${selectedDiv === c.key ? c.accentColor + "50" : r(0.06)}`,

@@ -259,10 +259,10 @@ const GenerateKundali = () => {
       setError("Please enter the birth place");
       return false;
     }
-    if (!formData.latitude || !formData.longitude) {
-      setError("Please select a valid location from the suggestions");
-      return false;
-    }
+    if (formData.timezoneOffset === null || formData.timezoneOffset === undefined) {
+  setError("Could not detect timezone for this location. Please try selecting a nearby major city.");
+  return false;
+}
     return true;
   };
 

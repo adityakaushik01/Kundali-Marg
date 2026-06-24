@@ -80,7 +80,8 @@ if (kundaliLimit !== UNLIMITED_KUNDALI_LIMIT && user.kundali_created_count >= ku
     }
 
     const birthDate = new Date(datetime + "Z");
-    const birthDateUTC = new Date(birthDate.getTime() - (timezoneOffset || 0) * 1000);
+const timezoneOffsetSafe = typeof timezoneOffset === "number" ? timezoneOffset : 0;
+const birthDateUTC = new Date(birthDate.getTime() - timezoneOffsetSafe * 1000);
     if (isNaN(birthDate.getTime())) {
       return res.status(400).json({
         error: 'Invalid datetime',

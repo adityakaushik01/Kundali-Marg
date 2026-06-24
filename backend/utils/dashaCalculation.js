@@ -22,7 +22,7 @@ export const DASHA_YEARS = {
   Mercury: 17,
 };
 
-const NAKSHATRA_SIZE = 13.3333333333;
+const NAKSHATRA_SIZE = 360 / 27;
 
 //  Calculate remaining dasha at birth
 export function calculateDashaBalance(degreeInNakshatra, dashaYears) {
